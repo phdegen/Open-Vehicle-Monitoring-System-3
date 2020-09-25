@@ -36,137 +36,99 @@
 #include "ovms_events.h"
 
 #include "ovms_log.h"
-static const char *TAG = "bt-gatts";
+static const char *TAG = "bt-gatt-server";
 
 esp32bluetoothGATTS MyBluetoothGATTS __attribute__ ((init_priority (8012)));
 
 ////////////////////////////////////////////////////////////////////////
-// esp32bluetoothCharacteristic
-
-esp32bluetoothCharacteristic::esp32bluetoothCharacteristic(
-  esp32bluetoothApp* app,
-  esp_bt_uuid_t* charuuid,
-  esp_bt_uuid_t* descruuid = NULL)
-  {
-  m_app = app;
-  m_notifying = false;
-  m_indicating = false;
-
-  memcpy(&m_char_uuid,charuuid,sizeof(esp_bt_uuid_t));
-  m_char_handle = 0;
-  m_char_perm = 0;
-  m_char_property = 0;
-
-  if (descruuid != NULL)
-    {
-    memcpy(&m_descr_uuid,&descruuid,sizeof(esp_bt_uuid_t));
-    }
-  else
-    {
-    memset(&m_descr_uuid,0,sizeof(esp_bt_uuid_t));
-    }
-  m_descr_handle = 0;
-  }
-
-esp32bluetoothCharacteristic::~esp32bluetoothCharacteristic()
-  {
-  }
-
-////////////////////////////////////////////////////////////////////////
 // esp32bluetoothApp
 
-esp32bluetoothApp::esp32bluetoothApp(const char* name)
-  {
-  m_name = name;
-  m_gatts_if = ESP_GATT_IF_NONE;
-  m_app_id = 0;
-  m_conn_id = 0;
-  m_service_handle = 0;
-  memset(&m_service_id, 0, sizeof(m_service_id));
-  m_mtu = 0;
-  }
-
-esp32bluetoothApp::~esp32bluetoothApp()
+esp32bluetoothServerApp::esp32bluetoothServerApp(const char* name)
+: esp32bluetoothApp(name)
   {
   }
 
-void esp32bluetoothApp::EventRegistered(esp_ble_gatts_cb_param_t::gatts_reg_evt_param *reg)
+esp32bluetoothServerApp::~esp32bluetoothServerApp()
   {
   }
 
-void esp32bluetoothApp::EventRead(esp_ble_gatts_cb_param_t::gatts_read_evt_param *read)
+void esp32bluetoothServerApp::EventRegistered(esp_ble_gatts_cb_param_t::gatts_reg_evt_param *reg)
   {
   }
 
-void esp32bluetoothApp::EventWrite(esp_ble_gatts_cb_param_t::gatts_write_evt_param *write)
+void esp32bluetoothServerApp::EventRead(esp_ble_gatts_cb_param_t::gatts_read_evt_param *read)
   {
   }
 
-void esp32bluetoothApp::EventExecWrite(esp_ble_gatts_cb_param_t::gatts_exec_write_evt_param *execwrite)
+void esp32bluetoothServerApp::EventWrite(esp_ble_gatts_cb_param_t::gatts_write_evt_param *write)
   {
   }
 
-void esp32bluetoothApp::EventMTU(esp_ble_gatts_cb_param_t::gatts_mtu_evt_param *mtu)
+void esp32bluetoothServerApp::EventExecWrite(esp_ble_gatts_cb_param_t::gatts_exec_write_evt_param *execwrite)
   {
   }
 
-void esp32bluetoothApp::EventConf(esp_ble_gatts_cb_param_t::gatts_conf_evt_param *conf)
+void esp32bluetoothServerApp::EventMTU(esp_ble_gatts_cb_param_t::gatts_mtu_evt_param *mtu)
   {
   }
 
-void esp32bluetoothApp::EventUnregistered()
+void esp32bluetoothServerApp::EventConf(esp_ble_gatts_cb_param_t::gatts_conf_evt_param *conf)
   {
   }
 
-void esp32bluetoothApp::EventDelete(esp_ble_gatts_cb_param_t::gatts_delete_evt_param *del)
+void esp32bluetoothServerApp::EventUnregistered()
   {
   }
 
-void esp32bluetoothApp::EventStart(esp_ble_gatts_cb_param_t::gatts_start_evt_param *start)
+void esp32bluetoothServerApp::EventDelete(esp_ble_gatts_cb_param_t::gatts_delete_evt_param *del)
   {
   }
 
-void esp32bluetoothApp::EventStop(esp_ble_gatts_cb_param_t::gatts_stop_evt_param *stop)
+void esp32bluetoothServerApp::EventStart(esp_ble_gatts_cb_param_t::gatts_start_evt_param *start)
   {
   }
 
-void esp32bluetoothApp::EventConnect(esp_ble_gatts_cb_param_t::gatts_connect_evt_param *connect)
+void esp32bluetoothServerApp::EventStop(esp_ble_gatts_cb_param_t::gatts_stop_evt_param *stop)
   {
   }
 
-void esp32bluetoothApp::EventDisconnect(esp_ble_gatts_cb_param_t::gatts_disconnect_evt_param *disconnect)
+void esp32bluetoothServerApp::EventConnect(esp_ble_gatts_cb_param_t::gatts_connect_evt_param *connect)
   {
   }
 
-void esp32bluetoothApp::EventOpen(esp_ble_gatts_cb_param_t::gatts_open_evt_param *open)
+void esp32bluetoothServerApp::EventDisconnect(esp_ble_gatts_cb_param_t::gatts_disconnect_evt_param *disconnect)
   {
   }
 
-void esp32bluetoothApp::EventCancelOpen(esp_ble_gatts_cb_param_t::gatts_cancel_open_evt_param *cancelopen)
+void esp32bluetoothServerApp::EventOpen(esp_ble_gatts_cb_param_t::gatts_open_evt_param *open)
   {
   }
 
-void esp32bluetoothApp::EventClose(esp_ble_gatts_cb_param_t::gatts_close_evt_param *close)
+void esp32bluetoothServerApp::EventCancelOpen(esp_ble_gatts_cb_param_t::gatts_cancel_open_evt_param *cancelopen)
   {
   }
 
-void esp32bluetoothApp::EventListen()
+void esp32bluetoothServerApp::EventClose(esp_ble_gatts_cb_param_t::gatts_close_evt_param *close)
   {
   }
 
-void esp32bluetoothApp::EventCongest(esp_ble_gatts_cb_param_t::gatts_congest_evt_param *congest)
+void esp32bluetoothServerApp::EventListen()
   {
   }
 
-void esp32bluetoothApp::EventCreate(esp_ble_gatts_cb_param_t::gatts_add_attr_tab_evt_param *attrtab)
+void esp32bluetoothServerApp::EventCongest(esp_ble_gatts_cb_param_t::gatts_congest_evt_param *congest)
   {
   }
 
-void esp32bluetoothApp::EventAddChar(esp_ble_gatts_cb_param_t::gatts_add_char_evt_param *addchar)
+void esp32bluetoothServerApp::EventCreate(esp_ble_gatts_cb_param_t::gatts_add_attr_tab_evt_param *attrtab)
   {
   }
 
-void esp32bluetoothApp::EventAddCharDescr(esp_ble_gatts_cb_param_t::gatts_add_char_descr_evt_param *adddescr)
+void esp32bluetoothServerApp::EventAddChar(esp_ble_gatts_cb_param_t::gatts_add_char_evt_param *addchar)
+  {
+  }
+
+void esp32bluetoothServerApp::EventAddCharDescr(esp_ble_gatts_cb_param_t::gatts_add_char_descr_evt_param *adddescr)
   {
   }
 
@@ -205,7 +167,7 @@ void esp32bluetoothGATTS::EventHandler(esp_gatts_cb_event_t event,
                                        esp_gatt_if_t gatts_if,
                                        esp_ble_gatts_cb_param_t *param)
   {
-  for (esp32bluetoothApp* app : m_apps)
+  for (esp32bluetoothServerApp* app : m_apps)
     {
     if (event == ESP_GATTS_REG_EVT)
       {
@@ -216,7 +178,7 @@ void esp32bluetoothGATTS::EventHandler(esp_gatts_cb_event_t event,
           {
           ESP_LOGI(TAG,"ESP_GATTS_REG_EVT register app %s (0x%04x) ok with interface ID %d",
                    app->m_name, param->reg.app_id, gatts_if);
-          app->m_gatts_if = gatts_if;
+          app->m_gatt_if = gatts_if;
           }
         else
           {
@@ -229,7 +191,7 @@ void esp32bluetoothGATTS::EventHandler(esp_gatts_cb_event_t event,
         }
       }
     if ((gatts_if == ESP_GATT_IF_NONE) ||
-        (gatts_if == app->m_gatts_if))
+        (gatts_if == app->m_gatt_if))
       {
       switch (event)
         {
@@ -426,7 +388,7 @@ void esp32bluetoothGATTS::EventHandler(esp_gatts_cb_event_t event,
 
 void esp32bluetoothGATTS::RegisterAllApps()
   {
-  for (esp32bluetoothApp* app : m_apps)
+  for (esp32bluetoothServerApp* app : m_apps)
     {
     esp_err_t ret = esp_ble_gatts_app_register(app->m_app_id);
     if (ret)
@@ -443,9 +405,9 @@ void esp32bluetoothGATTS::RegisterAllApps()
 
 void esp32bluetoothGATTS::UnregisterAllApps()
   {
-  for (esp32bluetoothApp* app : m_apps)
+  for (esp32bluetoothServerApp* app : m_apps)
     {
-    esp_err_t ret = esp_ble_gatts_app_unregister(app->m_gatts_if);
+    esp_err_t ret = esp_ble_gatts_app_unregister(app->m_gatt_if);
     if (ret)
       {
       ESP_LOGE(TAG, "App %s unregister error, error code = %x",
@@ -458,7 +420,7 @@ void esp32bluetoothGATTS::UnregisterAllApps()
     }
   }
 
-void esp32bluetoothGATTS::RegisterApp(esp32bluetoothApp* app)
+void esp32bluetoothGATTS::RegisterApp(esp32bluetoothServerApp* app)
   {
   m_apps.push_back(app);
   app->m_app_slot = m_apps.size()-1;
