@@ -40,7 +40,7 @@
 #define GATTS_DESCR_UUID_OVMS_METRICS     0x3053
 #define GATTS_NUM_HANDLE_OVMS_METRICS     4
 
-class OvmsBluetoothAppMetrics : public esp32bluetoothApp
+class OvmsBluetoothAppMetrics : public esp32bluetoothServerApp
   {
   public:
     OvmsBluetoothAppMetrics();
@@ -53,12 +53,7 @@ class OvmsBluetoothAppMetrics : public esp32bluetoothApp
     void EventAddChar(esp_ble_gatts_cb_param_t::gatts_add_char_evt_param *addchar);
 
   private:
-    uint16_t m_char_handle;
-    esp_bt_uuid_t m_char_uuid;
-    esp_gatt_perm_t m_perm;
-    esp_gatt_char_prop_t m_property;
-    uint16_t m_descr_handle;
-    esp_bt_uuid_t m_descr_uuid;    
+    esp32bluetoothCharacteristic m_metrics_characteristic;   
   };
 
 #endif //#ifndef __ESP32BLUETOOTH_SVC_METRICS_H__

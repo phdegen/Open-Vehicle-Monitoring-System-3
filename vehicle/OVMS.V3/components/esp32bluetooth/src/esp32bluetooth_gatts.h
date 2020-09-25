@@ -31,39 +31,13 @@
 #ifndef __ESP32BLUETOOTH_GATTS_H__
 #define __ESP32BLUETOOTH_GATTS_H__
 
-#include <vector>
-#include "esp32bluetooth.h"
+#include "esp32bluetooth_gatt.h"
 
-class esp32bluetoothApp;
-
-class esp32bluetoothCharacteristic
+class esp32bluetoothServerApp : public esp32bluetoothApp
   {
   public:
-    esp32bluetoothCharacteristic(esp32bluetoothApp* app,
-      esp_bt_uuid_t* charuuid,
-      esp_bt_uuid_t* descruuid);
-    ~esp32bluetoothCharacteristic();
-
-  public:
-    esp32bluetoothApp* m_app;
-
-    esp_bt_uuid_t m_char_uuid;
-    uint16_t m_char_handle;
-    esp_gatt_perm_t m_char_perm;
-    esp_gatt_char_prop_t m_char_property;
-
-    uint16_t m_descr_handle;
-    esp_bt_uuid_t m_descr_uuid;
-
-    bool m_notifying;
-    bool m_indicating;
-  };
-
-class esp32bluetoothApp
-  {
-  public:
-    esp32bluetoothApp(const char* name);
-    ~esp32bluetoothApp();
+    esp32bluetoothServerApp(const char* name);
+    ~esp32bluetoothServerApp();
 
   public:
     virtual void EventRegistered(esp_ble_gatts_cb_param_t::gatts_reg_evt_param *reg);
@@ -86,37 +60,27 @@ class esp32bluetoothApp
     virtual void EventCreate(esp_ble_gatts_cb_param_t::gatts_add_attr_tab_evt_param *attrtab);
     virtual void EventAddChar(esp_ble_gatts_cb_param_t::gatts_add_char_evt_param *addchar);
     virtual void EventAddCharDescr(esp_ble_gatts_cb_param_t::gatts_add_char_descr_evt_param *adddescr);
-
-  public:
-    const char* m_name;
-    uint16_t m_app_slot;
-    esp_gatt_if_t m_gatts_if;
-    uint16_t m_app_id;
-    uint16_t m_conn_id;
-    uint16_t m_service_handle;
-    esp_gatt_srvc_id_t m_service_id;
-    uint16_t m_mtu;
   };
 
-class esp32bluetoothGATTS
+class esp32bluetoothGATTS : public esp32bluetoothGATT
   {
   public:
     esp32bluetoothGATTS();
     ~esp32bluetoothGATTS();
-
   public:
-    void RegisterForEvents();
+    void RegisterForEvents() override;
+    void RegisterAllApps() override;
+    void UnregisterAllApps() override;
     void EventHandler(esp_gatts_cb_event_t event,
                       esp_gatt_if_t gatts_if,
                       esp_ble_gatts_cb_param_t *param);
-    void RegisterAllApps();
-    void UnregisterAllApps();
+    
+  public:
+    void RegisterApp(esp32bluetoothServerApp* app);
 
   public:
-    void RegisterApp(esp32bluetoothApp* app);
-
-  private:
-    std::vector<esp32bluetoothApp*> m_apps;
+    std::vector<esp32bluetoothServerApp*> m_apps;
+  
   };
 
 extern esp32bluetoothGATTS MyBluetoothGATTS;

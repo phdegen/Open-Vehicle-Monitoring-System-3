@@ -28,32 +28,68 @@
 ; THE SOFTWARE.
 */
 
-#ifndef __ESP32BLUETOOTH_SVC_DEVICE_H__
-#define __ESP32BLUETOOTH_SVC_DEVICE_H__
+#include "esp32bluetooth_gatt.h"
 
-#include "esp32bluetooth.h"
-#include "esp32bluetooth_gatts.h"
+////////////////////////////////////////////////////////////////////////
+// esp32bluetoothCharacteristic
 
-#define GATTS_APP_UUID_OVMS_DEVICE       0x10
-#define GATTS_SERVICE_UUID_OVMS_DEVICE   0x1041
-#define GATTS_CHAR_UUID_OVMS_DEVICE      0x1042
-#define GATTS_DESCR_UUID_OVMS_DEVICE     0x1043
-#define GATTS_NUM_HANDLE_OVMS_DEVICE     4
-
-class OvmsBluetoothAppDevice : public esp32bluetoothServerApp
+esp32bluetoothCharacteristic::esp32bluetoothCharacteristic()
   {
-  public:
-    OvmsBluetoothAppDevice();
-    ~OvmsBluetoothAppDevice();
+  m_app = NULL;
+  m_notifying = false;
+  m_indicating = false;
 
-  public:
-    void EventRegistered(esp_ble_gatts_cb_param_t::gatts_reg_evt_param *reg);
-    void EventRead(esp_ble_gatts_cb_param_t::gatts_read_evt_param *read);
-    void EventCreate(esp_ble_gatts_cb_param_t::gatts_add_attr_tab_evt_param *attrtab);
-    void EventAddChar(esp_ble_gatts_cb_param_t::gatts_add_char_evt_param *addchar);
+  m_char_handle = 0;
+  memset(&m_char_uuid, 0, sizeof(m_char_uuid));
+  m_char_perm = 0;
+  m_char_property = 0;
+  m_descr_handle = 0;
+  memset(&m_descr_uuid, 0, sizeof(m_descr_uuid));
+  }
 
-  private:
-    esp32bluetoothCharacteristic m_device_characteristic;
-  };
+esp32bluetoothCharacteristic::~esp32bluetoothCharacteristic()
+  {
+  }
 
-#endif //#ifndef __ESP32BLUETOOTH_SVC_DEVICE_H__
+////////////////////////////////////////////////////////////////////////
+// esp32bluetoothApp
+
+esp32bluetoothApp::esp32bluetoothApp(const char* name)
+  {
+  m_name = name;
+  m_gatt_if = ESP_GATT_IF_NONE;
+  m_app_id = 0;
+  m_conn_id = 0;
+  m_service_handle = 0;
+  memset(&m_service_id, 0, sizeof(m_service_id));
+  m_mtu = 0;
+  }
+
+esp32bluetoothApp::~esp32bluetoothApp()
+  {
+  }
+
+
+////////////////////////////////////////////////////////////////////////
+// esp32bluetoothGATT
+
+
+esp32bluetoothGATT::esp32bluetoothGATT()
+  {
+  }
+
+esp32bluetoothGATT::~esp32bluetoothGATT()
+  {
+  }
+
+void esp32bluetoothGATT::RegisterForEvents()
+  {
+  }
+
+void esp32bluetoothGATT::RegisterAllApps()
+  {
+  }
+
+void esp32bluetoothGATT::UnregisterAllApps()
+  {
+  }

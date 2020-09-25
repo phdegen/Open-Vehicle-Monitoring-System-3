@@ -51,16 +51,12 @@ static esp_attr_value_t gatts_demo_char1_val =
 OvmsBluetoothAppDevice MyBluetoothAppDevice __attribute__ ((init_priority (8015)));
 
 OvmsBluetoothAppDevice::OvmsBluetoothAppDevice()
-  : esp32bluetoothApp("device")
+  : esp32bluetoothServerApp("device")
   {
   ESP_LOGI(TAG, "Initialising Bluetooth DEVICE App (8015)");
 
-  m_char_handle = 0;
-  memset(&m_char_uuid, 0, sizeof(m_char_uuid));
-  m_perm = 0;
-  m_property = 0;
-  m_descr_handle = 0;
-  memset(&m_descr_uuid, 0, sizeof(m_descr_uuid));
+  m_device_characteristic.m_app = (esp32bluetoothApp*) this;
+  m_characteristics.push_back(&m_device_characteristic);
 
   m_app_id = GATTS_APP_UUID_OVMS_DEVICE;
   //MyBluetoothGATTS.RegisterApp(this);
@@ -78,8 +74,8 @@ void OvmsBluetoothAppDevice::EventRegistered(esp_ble_gatts_cb_param_t::gatts_reg
   m_service_id.id.uuid.uuid.uuid16 = GATTS_SERVICE_UUID_OVMS_DEVICE;
   ESP_LOGI(TAG,"ESP_GATTS_REG_EVT Creating service %04x on interface %d",
     m_service_id.id.uuid.uuid.uuid16,
-    m_gatts_if);
-  esp_ble_gatts_create_service(m_gatts_if, &m_service_id, GATTS_NUM_HANDLE_OVMS_DEVICE);
+    m_gatt_if);
+  esp_ble_gatts_create_service(m_gatt_if, &m_service_id, GATTS_NUM_HANDLE_OVMS_DEVICE);
   }
 
 void OvmsBluetoothAppDevice::EventRead(esp_ble_gatts_cb_param_t::gatts_read_evt_param *read)
@@ -92,7 +88,7 @@ void OvmsBluetoothAppDevice::EventRead(esp_ble_gatts_cb_param_t::gatts_read_evt_
   rsp.attr_value.value[1] = 0xed;
   rsp.attr_value.value[2] = 0xbe;
   rsp.attr_value.value[3] = 0xef;
-  esp_ble_gatts_send_response(m_gatts_if,
+  esp_ble_gatts_send_response(m_gatt_if,
                               read->conn_id,
                               read->trans_id,
                               ESP_GATT_OK, &rsp);
@@ -100,12 +96,12 @@ void OvmsBluetoothAppDevice::EventRead(esp_ble_gatts_cb_param_t::gatts_read_evt_
 
 void OvmsBluetoothAppDevice::EventCreate(esp_ble_gatts_cb_param_t::gatts_add_attr_tab_evt_param *attrtab)
   {
-  m_char_uuid.len = ESP_UUID_LEN_16;
-  m_char_uuid.uuid.uuid16 = GATTS_CHAR_UUID_OVMS_DEVICE;
+  m_device_characteristic.m_char_uuid.len = ESP_UUID_LEN_16;
+  m_device_characteristic.m_char_uuid.uuid.uuid16 = GATTS_CHAR_UUID_OVMS_DEVICE;
   a_property = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
   esp_err_t add_char_ret =
     esp_ble_gatts_add_char(m_service_handle,
-                          &m_char_uuid,
+                          &m_device_characteristic.m_char_uuid,
                           ESP_GATT_PERM_READ_ENC_MITM,
                           a_property,
                           &gatts_demo_char1_val,
@@ -123,9 +119,9 @@ void OvmsBluetoothAppDevice::EventAddChar(esp_ble_gatts_cb_param_t::gatts_add_ch
   uint16_t length = 0;
   const uint8_t *prf_char;
 
-  m_char_handle = addchar->attr_handle;
-  m_descr_uuid.len = ESP_UUID_LEN_16;
-  m_descr_uuid.uuid.uuid16 = ESP_GATT_UUID_CHAR_CLIENT_CONFIG;
+  m_device_characteristic.m_char_handle = addchar->attr_handle;
+  m_device_characteristic.m_descr_uuid.len = ESP_UUID_LEN_16;
+  m_device_characteristic.m_descr_uuid.uuid.uuid16 = ESP_GATT_UUID_CHAR_CLIENT_CONFIG;
   esp_err_t get_attr_ret = esp_ble_gatts_get_attr_value(addchar->attr_handle, &length, &prf_char);
   if (get_attr_ret == ESP_FAIL)
     {
@@ -134,7 +130,7 @@ void OvmsBluetoothAppDevice::EventAddChar(esp_ble_gatts_cb_param_t::gatts_add_ch
 
   esp_err_t add_descr_ret = esp_ble_gatts_add_char_descr(
                          m_service_handle,
-                         &m_descr_uuid,
+                         &m_device_characteristic.m_descr_uuid,
                          ESP_GATT_PERM_READ,
                          NULL,NULL);
   if (add_descr_ret)
