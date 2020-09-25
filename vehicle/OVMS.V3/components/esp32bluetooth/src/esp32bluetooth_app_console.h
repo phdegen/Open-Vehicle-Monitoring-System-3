@@ -41,7 +41,7 @@
 #define GATTS_DESCR_UUID_OVMS_CONSOLE   0xffe1
 #define GATTS_NUM_HANDLE_OVMS_CONSOLE   4
 
-class OvmsBluetoothAppConsole : public esp32bluetoothApp
+class OvmsBluetoothAppConsole : public esp32bluetoothServerApp
   {
   public:
     OvmsBluetoothAppConsole();
@@ -61,13 +61,7 @@ class OvmsBluetoothAppConsole : public esp32bluetoothApp
 
   private:
     OvmsBluetoothConsole* m_console;
-    uint16_t m_char_handle;
-    esp_bt_uuid_t m_char_uuid;
-    esp_gatt_perm_t m_perm;
-    esp_gatt_char_prop_t m_property;
-    uint16_t m_descr_handle;
-    esp_bt_uuid_t m_descr_uuid;
-    bool m_notifying;
+    esp32bluetoothCharacteristic m_console_characteristic;
   };
 
 #endif //#ifndef __ESP32BLUETOOTH_SVC_CONSOLE_H__
