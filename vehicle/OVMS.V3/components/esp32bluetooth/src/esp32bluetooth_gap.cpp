@@ -31,6 +31,7 @@
 #include <string.h>
 #include "esp_system.h"
 #include "esp32bluetooth_gap.h"
+#include "esp32bluetooth_gattc.h"
 #include "ovms_events.h"
 
 #include "ovms_log.h"
@@ -89,7 +90,7 @@ static const char *esp_key_type_to_str(esp_ble_key_type_t key_type)
 void ble_gap_event_handler(esp_gap_ble_cb_event_t event,
                            esp_ble_gap_cb_param_t *param)
   {
-  MyBluetoothGAP.EventHandler(event, param);
+    MyBluetoothGAP.EventHandler(event, param);
   }
 
 esp32bluetoothGAP::esp32bluetoothGAP()
@@ -97,6 +98,13 @@ esp32bluetoothGAP::esp32bluetoothGAP()
   ESP_LOGI(TAG, "Initialising Bluetooth GAP (8011)");
 
   m_adv_config_done = 0;
+
+#ifdef BLE_GATTS_ON
+  m_gatts_active = true;
+#endif
+#ifdef BLE_GATTC_ON
+  m_gattc_active = true;
+#endif
 
   memset(&m_adv_config,0,sizeof(m_adv_config));
   m_adv_config.set_scan_rsp = false;
@@ -148,6 +156,16 @@ void esp32bluetoothGAP::RegisterForEvents()
   }
 
 void esp32bluetoothGAP::EventHandler(esp_gap_ble_cb_event_t event,
+                                     esp_ble_gap_cb_param_t *param){
+  if(m_gatts_active){
+    MyBluetoothGAP.GATTSEventHandler(event, param);
+  }
+  if(m_gattc_active){
+    MyBluetoothGAP.GATTCEventHandler(event, param);
+  }
+  }
+
+void esp32bluetoothGAP::GATTSEventHandler(esp_gap_ble_cb_event_t event,
                                      esp_ble_gap_cb_param_t *param)
   {
   switch (event)
@@ -292,4 +310,96 @@ void esp32bluetoothGAP::EventHandler(esp_gap_ble_cb_event_t event,
       ESP_LOGD(TAG, "GAP_EVT, event %d\n", event);
       break;
     }
+  }
+
+
+void esp32bluetoothGAP::GATTCEventHandler(esp_gap_ble_cb_event_t event,
+                                     esp_ble_gap_cb_param_t *param)
+  {
+  
+    uint8_t *adv_name = NULL;
+    uint8_t adv_name_len = 0;
+    switch (event) {
+    case ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT: {
+        //the unit of the duration is second
+        uint32_t duration = 30;
+        esp_ble_gap_start_scanning(duration);
+        break;
+    }
+    case ESP_GAP_BLE_SCAN_START_COMPLETE_EVT:
+        //scan start complete event to indicate scan start successfully or failed
+        if (param->scan_start_cmpl.status != ESP_BT_STATUS_SUCCESS) {
+            ESP_LOGE(TAG, "scan start failed, error status = %x", param->scan_start_cmpl.status);
+            break;
+        }
+        ESP_LOGI(TAG, "scan start success");
+
+        break;
+    case ESP_GAP_BLE_SCAN_RESULT_EVT: {
+        esp_ble_gap_cb_param_t *scan_result = (esp_ble_gap_cb_param_t *)param;
+        switch (scan_result->scan_rst.search_evt) {
+        case ESP_GAP_SEARCH_INQ_RES_EVT:
+            esp_log_buffer_hex(TAG, scan_result->scan_rst.bda, 6);
+            ESP_LOGI(TAG, "searched Adv Data Len %d, Scan Response Len %d", scan_result->scan_rst.adv_data_len, scan_result->scan_rst.scan_rsp_len);
+            adv_name = esp_ble_resolve_adv_data(scan_result->scan_rst.ble_adv,
+                                                ESP_BLE_AD_TYPE_NAME_CMPL, &adv_name_len);
+            ESP_LOGI(TAG, "advertised Device Name Len %d", adv_name_len);
+            esp_log_buffer_char(TAG, adv_name, adv_name_len);
+
+            ESP_LOGI(TAG, "\n");
+
+            for(auto app : MyBluetoothGATTC.m_apps){
+              const char * remote_device_name = app->m_adv_name.c_str();
+              if (adv_name != NULL) {
+                if (strlen(remote_device_name) == adv_name_len && strncmp((char *)adv_name, remote_device_name, adv_name_len) == 0) {
+                  ESP_LOGI(TAG, "searched device %s\n", remote_device_name);
+                  if (app->m_ble_connected == false) {
+                      app->m_ble_connected = true;
+                      ESP_LOGI(TAG, "connect to the remote device.");
+                      // demo example would stop scanning but here but it could have more than one client connected (?)
+                      //esp_ble_gap_stop_scanning();
+                      esp_ble_gattc_open(app->m_gatt_if, scan_result->scan_rst.bda, scan_result->scan_rst.ble_addr_type, true);
+                  }
+                }
+              }
+            }
+
+            
+            break;
+        case ESP_GAP_SEARCH_INQ_CMPL_EVT:
+            break;
+        default:
+            break;
+        }
+        break;
+    }
+
+    case ESP_GAP_BLE_SCAN_STOP_COMPLETE_EVT:
+        if (param->scan_stop_cmpl.status != ESP_BT_STATUS_SUCCESS){
+            ESP_LOGE(TAG, "scan stop failed, error status = %x", param->scan_stop_cmpl.status);
+            break;
+        }
+        ESP_LOGI(TAG, "stop scan successfully");
+        break;
+
+    case ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT:
+        if (param->adv_stop_cmpl.status != ESP_BT_STATUS_SUCCESS){
+            ESP_LOGE(TAG, "adv stop failed, error status = %x", param->adv_stop_cmpl.status);
+            break;
+        }
+        ESP_LOGI(TAG, "stop adv successfully");
+        break;
+    case ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT:
+         ESP_LOGI(TAG, "update connection params status = %d, min_int = %d, max_int = %d,conn_int = %d,latency = %d, timeout = %d",
+                  param->update_conn_params.status,
+                  param->update_conn_params.min_int,
+                  param->update_conn_params.max_int,
+                  param->update_conn_params.conn_int,
+                  param->update_conn_params.latency,
+                  param->update_conn_params.timeout);
+        break;
+    default:
+        break;
+    }
+
   }
