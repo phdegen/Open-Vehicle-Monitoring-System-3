@@ -34,10 +34,12 @@
 #include <stdint.h>
 #include "esp_bt.h"
 #include "esp_gap_ble_api.h"
-#include "esp_gatts_api.h"
 #include "esp_bt_defs.h"
 #include "esp_bt_main.h"
 #include "pcp.h"
+
+//#define BLE_GATTS_ON
+#define BLE_GATTC_ON
 
 class esp32bluetooth : public pcp, public InternalRamAllocated
   {
