@@ -33,6 +33,7 @@
 #include "esp32bluetooth.h"
 #include "esp32bluetooth_gap.h"
 #include "esp32bluetooth_gatts.h"
+#include "esp32bluetooth_gattc.h"
 #include "esp_bt.h"
 #include "ovms_peripherals.h"
 #include "ovms_config.h"
@@ -91,10 +92,21 @@ void esp32bluetooth::StartService()
     ESP_LOGE(TAG, "enable bluetooth failed: %s", esp_err_to_name(ret));
     return;
     }
-
+#ifdef BLE_GATTS_ON
   MyBluetoothGATTS.RegisterForEvents();
+#endif
+#ifdef BLE_GATTC_ON
+  MyBluetoothGATTC.RegisterForEvents();
+#endif
+
   MyBluetoothGAP.RegisterForEvents();
+
+#ifdef BLE_GATTS_ON
   MyBluetoothGATTS.RegisterAllApps();
+#endif
+#ifdef BLE_GATTC_ON
+  MyBluetoothGATTC.RegisterAllApps();
+#endif
 
   /* set the security iocap & auth_req & key size & init key response key parameters to the stack*/
   esp_ble_auth_req_t auth_req = ESP_LE_AUTH_BOND;     //bonding with peer device after authentication
@@ -127,7 +139,12 @@ void esp32bluetooth::StopService()
 
   ESP_LOGI(TAG,"Powering bluetooth off...");
 
+#ifdef BLE_GATTS_ON
   MyBluetoothGATTS.UnregisterAllApps();
+#endif
+#ifdef BLE_GATTC_ON
+  MyBluetoothGATTC.UnregisterAllApps();
+#endif
 
   ret = esp_bluedroid_disable();
   if (ret)

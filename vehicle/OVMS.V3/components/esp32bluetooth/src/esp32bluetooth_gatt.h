@@ -32,7 +32,11 @@
 #define __ESP32BLUETOOTH_GATT_H__
 
 #include <vector>
+#include "esp_gattc_api.h"
+#include "esp_gatts_api.h"
 #include "esp32bluetooth.h"
+
+#define GATT_CHAR_BUF_SIZE 8
 
 class esp32bluetoothApp;
 
@@ -53,8 +57,12 @@ class esp32bluetoothCharacteristic
     uint16_t m_descr_handle;
     esp_bt_uuid_t m_descr_uuid;
 
+    esp_bd_addr_t m_remote_bda;
+
     bool m_notifying;
     bool m_indicating;
+
+    uint8_t m_value_buffer[GATT_CHAR_BUF_SIZE];
   };
 
 class esp32bluetoothGATT
