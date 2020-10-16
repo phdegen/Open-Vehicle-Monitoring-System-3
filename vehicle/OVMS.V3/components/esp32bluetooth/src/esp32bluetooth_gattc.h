@@ -51,6 +51,7 @@ class esp32bluetoothClientApp : public esp32bluetoothApp
     virtual void EventWriteDescr(esp_ble_gattc_cb_param_t::gattc_write_evt_param *write);
     virtual void EventServiceChange(esp_ble_gattc_cb_param_t::gattc_srvc_chg_evt_param *srvc_chg);
     virtual void EventWriteChar(esp_ble_gattc_cb_param_t::gattc_write_evt_param *write);
+    virtual void EventReadChar(esp_ble_gattc_cb_param_t::gattc_read_char_evt_param *read);
     virtual void EventDisconnect(esp_ble_gattc_cb_param_t::gattc_disconnect_evt_param *disconnect);
 
     virtual void EventValueUpdate(int char_num);
@@ -61,7 +62,7 @@ class esp32bluetoothClientApp : public esp32bluetoothApp
 
     bool m_ble_connected;
     bool m_connected_to_server;
-    std::string m_adv_name = "";
+    std::string m_adv_name;
     };
 
 class esp32bluetoothGATTC : public esp32bluetoothGATT
