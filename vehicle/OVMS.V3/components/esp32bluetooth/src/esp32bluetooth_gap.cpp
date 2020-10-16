@@ -322,7 +322,7 @@ void esp32bluetoothGAP::GATTCEventHandler(esp_gap_ble_cb_event_t event,
     switch (event) {
     case ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT: {
         //the unit of the duration is second
-        uint32_t duration = 30;
+        uint32_t duration = 10;
         esp_ble_gap_start_scanning(duration);
         break;
     }
@@ -356,8 +356,8 @@ void esp32bluetoothGAP::GATTCEventHandler(esp_gap_ble_cb_event_t event,
                   if (app->m_ble_connected == false) {
                       app->m_ble_connected = true;
                       ESP_LOGI(TAG, "connect to the remote device.");
-                      // demo example would stop scanning but here but it could have more than one client connected (?)
-                      //esp_ble_gap_stop_scanning();
+                      // can only scan for one application at a time (?) if many applications running -> sequential scan
+                      esp_ble_gap_stop_scanning();
                       esp_ble_gattc_open(app->m_gatt_if, scan_result->scan_rst.bda, scan_result->scan_rst.ble_addr_type, true);
                   }
                 }
