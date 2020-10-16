@@ -237,7 +237,20 @@ void esp32bluetoothClientApp::EventWriteChar(esp_ble_gattc_cb_param_t::gattc_wri
   {
   }
 
+void esp32bluetoothClientApp::EventReadChar(esp_ble_gattc_cb_param_t::gattc_read_char_evt_param *read)
+  {
+    for(auto characteristic : m_characteristics){
+      if(read->handle == characteristic->m_char_handle){
+        memcpy(characteristic->m_value_buffer,read->value,read->value_len);
+      }
+    }
+  }
+
 void esp32bluetoothClientApp::EventDisconnect(esp_ble_gattc_cb_param_t::gattc_disconnect_evt_param *disconnect)
+  {
+  }
+
+void esp32bluetoothClientApp::EventValueUpdate(int char_num)
   {
   }
 
@@ -385,7 +398,6 @@ void esp32bluetoothGATTC::EventHandler(esp_gattc_cb_event_t event,
           } else {
             ESP_LOGI(TAG, "ESP_GATTC_SEARCH_CMPL_EVT/%s, unknown service source", app->m_name);
           }
-          ESP_LOGE(TAG, "ESP_GATTC_SEARCH_CMPL_EVT/%s", app->m_name);
 
           app->EventSearchComplete(&param->search_cmpl);
           break;
@@ -448,6 +460,17 @@ void esp32bluetoothGATTC::EventHandler(esp_gattc_cb_event_t event,
 
           break;
           }
+        case ESP_GATTC_READ_CHAR_EVT:
+          {
+          ESP_LOGI(TAG, "ESP_GATTC_READ_CHAR_EVT/%s, ", app->m_name);
+          if (param->read.status != ESP_GATT_OK){
+            ESP_LOGE(TAG, "read char failed, error status = %x", param->write.status);
+            break;
+          }
+          app->EventReadChar(&param->read);
+
+          break;
+          }
 
         case ESP_GATTC_DISCONNECT_EVT:
           {
@@ -493,6 +516,8 @@ void esp32bluetoothGATTC::UnregisterAllApps()
     else
       {
       ESP_LOGI(TAG,"App %s unregistered successfully",app->m_name);
+      app->m_ble_connected = false;
+      app->m_connected_to_server = false;
       }
     }
   }
