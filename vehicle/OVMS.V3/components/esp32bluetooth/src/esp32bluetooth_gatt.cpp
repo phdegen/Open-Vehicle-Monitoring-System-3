@@ -63,6 +63,9 @@ esp32bluetoothApp::esp32bluetoothApp(const char* name)
   m_service_handle = 0;
   memset(&m_service_id, 0, sizeof(m_service_id));
   m_mtu = 0;
+
+  m_active = false;
+
   }
 
 esp32bluetoothApp::~esp32bluetoothApp()

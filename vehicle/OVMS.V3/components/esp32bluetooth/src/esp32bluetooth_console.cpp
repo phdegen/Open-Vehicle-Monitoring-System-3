@@ -28,7 +28,7 @@
 ; THE SOFTWARE.
 */
 
-#include "esp32bluetooth_app_console.h"
+#include "esp32bluetooth_gatts_app_console.h"
 #include "esp32bluetooth_console.h"
 #include "ovms_log.h"
 

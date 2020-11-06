@@ -78,9 +78,6 @@ class esp32bluetoothGATTS : public esp32bluetoothGATT
   public:
     void RegisterApp(esp32bluetoothServerApp* app);
 
-  public:
-    std::vector<esp32bluetoothServerApp*> m_apps;
-  
   };
 
 extern esp32bluetoothGATTS MyBluetoothGATTS;

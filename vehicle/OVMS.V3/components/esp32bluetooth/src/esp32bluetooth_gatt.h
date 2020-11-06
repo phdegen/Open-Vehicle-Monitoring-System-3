@@ -76,6 +76,9 @@ class esp32bluetoothGATT
     virtual void RegisterAllApps();
     virtual void UnregisterAllApps();
 
+  public:
+  std::vector<esp32bluetoothApp*> m_apps;
+
   };
 
 class esp32bluetoothApp
@@ -93,6 +96,8 @@ class esp32bluetoothApp
     uint16_t m_service_handle;
     esp_gatt_srvc_id_t m_service_id;
     uint16_t m_mtu;
+
+    bool m_active;
 
     std::vector<esp32bluetoothCharacteristic*> m_characteristics;
   };
