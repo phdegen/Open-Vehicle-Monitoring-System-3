@@ -49,10 +49,11 @@ class esp32bluetoothGAP
     void GATTCEventHandler(esp_gap_ble_cb_event_t event,
                       esp_ble_gap_cb_param_t *param);
 
-  private:
+  public:
     bool m_gatts_active;
     bool m_gattc_active;
-
+  
+  private:
     esp_ble_adv_data_t m_adv_config;
     esp_ble_adv_data_t m_scan_rsp_config;
     esp_ble_adv_params_t m_adv_params;

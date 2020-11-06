@@ -36,6 +36,7 @@
 #include "esp_gap_ble_api.h"
 #include "esp_bt_defs.h"
 #include "esp_bt_main.h"
+#include "ovms_config.h"
 #include "pcp.h"
 
 //#define BLE_GATTS_ON
@@ -51,9 +52,12 @@ class esp32bluetooth : public pcp, public InternalRamAllocated
     void StartService();
     void StopService();
     bool IsServiceRunning();
+    void ConfigChanged(OvmsConfigParam* param);
+    void SetPowerMode(PowerMode powermode);
 
   public:
-    void SetPowerMode(PowerMode powermode);
+    bool m_gatts_active;
+    bool m_gattc_active;
 
   protected:
     bool m_service_running;
