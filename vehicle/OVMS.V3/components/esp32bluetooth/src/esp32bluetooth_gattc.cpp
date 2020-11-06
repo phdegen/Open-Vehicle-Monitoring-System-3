@@ -248,6 +248,8 @@ void esp32bluetoothClientApp::EventReadChar(esp_ble_gattc_cb_param_t::gattc_read
 
 void esp32bluetoothClientApp::EventDisconnect(esp_ble_gattc_cb_param_t::gattc_disconnect_evt_param *disconnect)
   {
+    m_ble_connected = false;
+    m_connected_to_server = false;
   }
 
 void esp32bluetoothClientApp::EventValueUpdate(int char_num)
