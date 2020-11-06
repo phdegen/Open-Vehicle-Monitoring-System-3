@@ -36,7 +36,7 @@
 #include "esp32bluetooth_gattc.h"
 #include "esp_bt.h"
 #include "ovms_peripherals.h"
-#include "ovms_config.h"
+#include "ovms_utils.h"
 
 #include "ovms_log.h"
 static const char *TAG = "bt";
@@ -46,6 +46,9 @@ esp32bluetooth::esp32bluetooth(const char* name)
   {
   m_service_running = false;
   m_powermode = Off;
+
+  MyConfig.RegisterParam("bt", "Bluetooth BLE Configs", true, true);
+  ConfigChanged(NULL);
   }
 
 esp32bluetooth::~esp32bluetooth()
@@ -92,21 +95,27 @@ void esp32bluetooth::StartService()
     ESP_LOGE(TAG, "enable bluetooth failed: %s", esp_err_to_name(ret));
     return;
     }
-#ifdef BLE_GATTS_ON
-  MyBluetoothGATTS.RegisterForEvents();
-#endif
-#ifdef BLE_GATTC_ON
-  MyBluetoothGATTC.RegisterForEvents();
-#endif
+
+  if(m_gatts_active)
+  {    
+    MyBluetoothGATTS.RegisterForEvents();
+  }
+  if(m_gattc_active)
+  {   
+    MyBluetoothGATTC.RegisterForEvents();
+  }
+
 
   MyBluetoothGAP.RegisterForEvents();
 
-#ifdef BLE_GATTS_ON
-  MyBluetoothGATTS.RegisterAllApps();
-#endif
-#ifdef BLE_GATTC_ON
-  MyBluetoothGATTC.RegisterAllApps();
-#endif
+  if(m_gatts_active)
+  {
+    MyBluetoothGATTS.RegisterAllApps();
+  }
+  if(m_gattc_active)
+  {
+    MyBluetoothGATTC.RegisterAllApps();
+  }
 
   /* set the security iocap & auth_req & key size & init key response key parameters to the stack*/
   esp_ble_auth_req_t auth_req = ESP_LE_AUTH_BOND;     //bonding with peer device after authentication
@@ -139,12 +148,15 @@ void esp32bluetooth::StopService()
 
   ESP_LOGI(TAG,"Powering bluetooth off...");
 
-#ifdef BLE_GATTS_ON
-  MyBluetoothGATTS.UnregisterAllApps();
-#endif
-#ifdef BLE_GATTC_ON
-  MyBluetoothGATTC.UnregisterAllApps();
-#endif
+  if(m_gatts_active)
+  {
+    MyBluetoothGATTS.UnregisterAllApps();
+  }
+
+  if(m_gattc_active)
+  {
+    MyBluetoothGATTC.UnregisterAllApps();
+  }
 
   ret = esp_bluedroid_disable();
   if (ret)
@@ -198,6 +210,16 @@ void esp32bluetooth::SetPowerMode(PowerMode powermode)
     default:
       break;
     };
+  }
+
+void esp32bluetooth::ConfigChanged(OvmsConfigParam* param)
+  {
+  if (param && param->GetName() != "bt")
+    return;
+  ESP_LOGD(TAG, "load config");
+
+  m_gatts_active = MyConfig.GetParamValueBool("bt", "gatts.active", false);
+  m_gattc_active = MyConfig.GetParamValueBool("bt", "gattc.active", false);
   }
 
 void bluetooth_status(int verbosity, OvmsWriter* writer, OvmsCommand* cmd, int argc, const char* const* argv)
@@ -261,6 +283,161 @@ void bluetooth_clear(int verbosity, OvmsWriter* writer, OvmsCommand* cmd, int ar
   free(clist);
   }
 
+void bluetooth_set_gatts_active(int verbosity, OvmsWriter* writer, OvmsCommand* cmd, int argc, const char* const* argv)
+  {
+  esp32bluetooth *me = MyPeripherals->m_esp32bluetooth;
+  bool gatts_active = me->m_gatts_active;
+  if(argc>0){
+    gatts_active = strtobool(std::string(argv[0]));
+    me->m_gatts_active = gatts_active;
+    MyConfig.SetParamValueBool("bt", "gatts.active", gatts_active);
+  }
+  MyBluetoothGAP.m_gatts_active = gatts_active;
+  std::string return_str = me->m_gatts_active ? "gatts active\n" : "gatts inactive\n";
+  writer->printf("%s",return_str.c_str());
+  }
+
+void bluetooth_set_gattc_active(int verbosity, OvmsWriter* writer, OvmsCommand* cmd, int argc, const char* const* argv)
+  {
+  esp32bluetooth *me = MyPeripherals->m_esp32bluetooth;
+  bool gattc_active = me->m_gattc_active;
+  if(argc>0){
+    gattc_active = strtobool(std::string(argv[0]));
+    me->m_gattc_active = gattc_active;
+    MyConfig.SetParamValueBool("bt", "gattc.active", gattc_active);
+  }
+  MyBluetoothGAP.m_gattc_active = gattc_active;
+  std::string return_str = me->m_gattc_active ? "gattc active\n" : "gattc inactive\n" ;
+  writer->printf("%s",return_str.c_str());
+  }
+
+void bluetooth_list_gatt_apps(esp32bluetoothGATT* gatt_category, int verbosity, OvmsWriter* writer, OvmsCommand* cmd, int argc, const char* const* argv)
+  {
+  std::string return_string = "";
+  for(int i=0;i<gatt_category->m_apps.size();i++)
+  {
+    std::string app_str = "App Nr.";
+    char int_str[10];
+    sprintf(int_str, "%d", i);
+    app_str.append(int_str);
+    app_str.append(": ");
+    app_str.append(gatt_category->m_apps[i]->m_name);
+    app_str.append(" - ");
+    std::string active_str = gatt_category->m_apps[i]->m_active ? "active" : "inactive";
+    app_str.append(active_str);
+    app_str.append("\n");
+    return_string.append(app_str);
+  }
+  
+  writer->printf("%s",return_string.c_str());
+
+  }
+
+void bluetooth_list_gatts_apps(int verbosity, OvmsWriter* writer, OvmsCommand* cmd, int argc, const char* const* argv)
+  {
+  std::string return_string = "BLE GATTS Apps: \n";
+  writer->printf("%s",return_string.c_str());
+  bluetooth_list_gatt_apps(static_cast<esp32bluetoothGATT*>(&MyBluetoothGATTS),verbosity,writer,cmd,argc,argv);
+  }
+
+void bluetooth_list_gattc_apps(int verbosity, OvmsWriter* writer, OvmsCommand* cmd, int argc, const char* const* argv)
+  {
+  std::string return_string = "BLE GATTC Apps: \n";
+  writer->printf("%s",return_string.c_str());
+  bluetooth_list_gatt_apps(static_cast<esp32bluetoothGATT*>(&MyBluetoothGATTC),verbosity,writer,cmd,argc,argv);
+  }
+
+void bluetooth_activeate_gatt_app(esp32bluetoothGATT* gatt_category, int verbosity, OvmsWriter* writer, OvmsCommand* cmd, int argc, const char* const* argv)
+  {
+    
+    if(argc == 2)
+    {
+      int idx = atoi(argv[0]);
+      bool active = strtobool(std::string(argv[1]));
+
+      MyBluetoothGATTS.m_apps[idx]->m_active = active;
+    }
+    else
+    {
+      writer->printf("wrong amount of arguments: needs 2 (idx(int) and activeate/deactivate(bool)");
+    }
+  }
+
+void bluetooth_activeate_gatts_app(int verbosity, OvmsWriter* writer, OvmsCommand* cmd, int argc, const char* const* argv)
+  {
+    bluetooth_activeate_gatt_app(static_cast<esp32bluetoothGATT*>(&MyBluetoothGATTS),verbosity,writer,cmd,argc,argv);
+  }
+
+void bluetooth_activeate_gattc_app(int verbosity, OvmsWriter* writer, OvmsCommand* cmd, int argc, const char* const* argv)
+  {
+    bluetooth_activeate_gatt_app(static_cast<esp32bluetoothGATT*>(&MyBluetoothGATTC),verbosity,writer,cmd,argc,argv);
+  }
+
+void bluetooth_gatt_app_info(esp32bluetoothGATT* gatt_category, int verbosity, OvmsWriter* writer, OvmsCommand* cmd, int argc, const char* const* argv)
+  {
+  if(argc == 1)
+    {
+      int idx = atoi(argv[0]);
+      auto app = gatt_category->m_apps[idx];
+
+      std::string name = app->m_name;
+      int num_chars = app->m_characteristics.size();
+      std::string chars_string = "";
+      chars_string.append("App - ");
+      chars_string.append(name);
+      chars_string.append(":\n");
+      for(int i=0;i<num_chars; i++)
+      {
+        chars_string.append("characteristic nr. ");
+        char int_str[10];
+        sprintf(int_str, "%d", i);
+        chars_string.append(int_str);
+        chars_string.append(" with uuid: ");
+        auto uuid = app->m_characteristics[i]->m_char_uuid;
+        uint8_t * uuid_p = NULL;
+        switch (uuid.len)
+        {
+        case ESP_UUID_LEN_16:
+          uuid_p = (uint8_t*) &(uuid.uuid.uuid16);
+          break;
+        case ESP_UUID_LEN_32:
+          uuid_p = (uint8_t*) &(uuid.uuid.uuid32);
+          break;
+        case ESP_UUID_LEN_128:
+          uuid_p = uuid.uuid.uuid128;
+          break;
+        default:
+          break;
+        }
+        char uuid_str[40];
+        const char * uuid_str_chararr = uuid_str;
+        char * running_str_p = uuid_str;
+        for(int k=1;k<=uuid.len;k++)
+        {
+          running_str_p = HexByte(running_str_p,*(uuid_p+uuid.len-k));
+        }
+        std::string hex_uuid_str = std::string(uuid_str_chararr,2*uuid.len);
+        chars_string.append(hex_uuid_str);
+        chars_string.append("\n");
+      }
+      writer->printf(chars_string.c_str());
+    }
+    else
+    {
+      writer->printf("wrong amount of arguments: needs idx(int)");
+    }
+  }
+
+void bluetooth_gatts_app_info(int verbosity, OvmsWriter* writer, OvmsCommand* cmd, int argc, const char* const* argv)
+  {
+    bluetooth_gatt_app_info(static_cast<esp32bluetoothGATT*>(&MyBluetoothGATTS),verbosity,writer,cmd,argc,argv);
+  }
+
+void bluetooth_gattc_app_info(int verbosity, OvmsWriter* writer, OvmsCommand* cmd, int argc, const char* const* argv)
+  {
+    bluetooth_gatt_app_info(static_cast<esp32bluetoothGATT*>(&MyBluetoothGATTC),verbosity,writer,cmd,argc,argv);
+  }
+
 class esp32bluetoothInit
   {
   public: esp32bluetoothInit();
@@ -275,4 +452,19 @@ esp32bluetoothInit::esp32bluetoothInit()
   OvmsCommand* cmd_bt = MyCommandApp.RegisterCommand("bt","BLUETOOTH framework", bluetooth_status);
   cmd_bt->RegisterCommand("status","Show bluetooth status",bluetooth_status);
   cmd_bt->RegisterCommand("clear","Clear bluetooth registrations",bluetooth_clear, "(<mac>)", 0, 1);
+  
+  OvmsCommand* cmd_ble_gatts = cmd_bt->RegisterCommand("gatts", "Set ble gatt server active configuration", bluetooth_set_gatts_active);
+  OvmsCommand* cmd_ble_gattc = cmd_bt->RegisterCommand("gattc", "Set ble gatt client active configuration", bluetooth_set_gattc_active);
+  cmd_ble_gatts->RegisterCommand("active", "Set ble gatt server active configuration", bluetooth_set_gatts_active, "true/false",0,1);
+  cmd_ble_gattc->RegisterCommand("active", "Set ble gatt client active configuration", bluetooth_set_gattc_active, "true/false",0,1);
+  
+  OvmsCommand* cmd_gatts_apps = cmd_ble_gatts->RegisterCommand("app", "list gatts apps with status", bluetooth_list_gatts_apps);
+  OvmsCommand* cmd_gattc_apps = cmd_ble_gattc->RegisterCommand("app", "list gattc apps with status", bluetooth_list_gattc_apps);
+  cmd_gatts_apps->RegisterCommand("list", "list gatts apps with status", bluetooth_list_gatts_apps);
+  cmd_gattc_apps->RegisterCommand("list", "list gattc apps with status", bluetooth_list_gattc_apps);
+  cmd_gatts_apps->RegisterCommand("activate", "activate respective app with index", bluetooth_activeate_gatts_app,"app_idx[int] true/false",2,2);
+  cmd_gattc_apps->RegisterCommand("activate", "activate respective app with index", bluetooth_activeate_gattc_app,"app_idx[int] true/false",2,2);
+  cmd_gatts_apps->RegisterCommand("info", "get app info(characteristics) with index", bluetooth_gatts_app_info,"app_idx[int]",1,1);
+  cmd_gattc_apps->RegisterCommand("info", "get app info(characteristics) with index", bluetooth_gattc_app_info,"app_idx[int]",1,1);
+
   }
