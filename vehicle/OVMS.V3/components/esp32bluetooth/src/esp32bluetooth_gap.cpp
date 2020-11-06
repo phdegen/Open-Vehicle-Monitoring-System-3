@@ -99,12 +99,8 @@ esp32bluetoothGAP::esp32bluetoothGAP()
 
   m_adv_config_done = 0;
 
-#ifdef BLE_GATTS_ON
-  m_gatts_active = true;
-#endif
-#ifdef BLE_GATTC_ON
-  m_gattc_active = true;
-#endif
+  m_gatts_active = false;
+  m_gattc_active = false;
 
   memset(&m_adv_config,0,sizeof(m_adv_config));
   m_adv_config.set_scan_rsp = false;
