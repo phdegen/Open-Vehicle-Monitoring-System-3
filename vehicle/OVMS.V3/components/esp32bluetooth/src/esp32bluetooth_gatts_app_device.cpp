@@ -30,7 +30,7 @@
 
 #include <string.h>
 #include "esp_system.h"
-#include "esp32bluetooth_app_device.h"
+#include "esp32bluetooth_gatts_app_device.h"
 
 #include "ovms_log.h"
 static const char *TAG = "bt-app-device";
@@ -59,7 +59,7 @@ OvmsBluetoothAppDevice::OvmsBluetoothAppDevice()
   m_characteristics.push_back(&m_device_characteristic);
 
   m_app_id = GATTS_APP_UUID_OVMS_DEVICE;
-  //MyBluetoothGATTS.RegisterApp(this);
+  MyBluetoothGATTS.RegisterApp(this);
   }
 
 OvmsBluetoothAppDevice::~OvmsBluetoothAppDevice()

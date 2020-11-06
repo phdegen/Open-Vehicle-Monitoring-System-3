@@ -30,7 +30,7 @@
 
 #include <string.h>
 #include "esp_system.h"
-#include "esp32bluetooth_app_console.h"
+#include "esp32bluetooth_gatts_app_console.h"
 
 #include "ovms_log.h"
 static const char *TAG = "bt-app-console";
@@ -61,6 +61,7 @@ OvmsBluetoothAppConsole::OvmsBluetoothAppConsole()
   m_console = NULL;
 
   m_app_id = GATTS_APP_UUID_OVMS_CONSOLE;
+  m_active = true;
   MyBluetoothGATTS.RegisterApp(this);
   }
 
