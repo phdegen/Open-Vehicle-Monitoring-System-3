@@ -68,6 +68,7 @@ OvmsBluetoothAppGATTCExample::OvmsBluetoothAppGATTCExample()
     m_characteristics.push_back(&m_example_characteristic_1);
 
     m_app_id = GATTC_APP_UUID_OVMS_EXAMPLE;
+    m_active = true;
     MyBluetoothGATTC.RegisterApp(this);
   }
 

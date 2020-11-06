@@ -348,7 +348,12 @@ void esp32bluetoothGAP::GATTCEventHandler(esp_gap_ble_cb_event_t event,
 
             ESP_LOGI(TAG, "\n");
 
-            for(auto app : MyBluetoothGATTC.m_apps){
+            for(auto app_generic : MyBluetoothGATTC.m_apps){
+              esp32bluetoothClientApp* app = static_cast<esp32bluetoothClientApp*>(app_generic);
+              if(!app->m_active)
+              {
+                continue;
+              }
               const char * remote_device_name = app->m_adv_name.c_str();
               if (adv_name != NULL) {
                 if (strlen(remote_device_name) == adv_name_len && strncmp((char *)adv_name, remote_device_name, adv_name_len) == 0) {

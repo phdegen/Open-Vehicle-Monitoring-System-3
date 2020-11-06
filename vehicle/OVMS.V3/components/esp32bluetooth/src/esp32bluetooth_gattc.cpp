@@ -295,8 +295,13 @@ void esp32bluetoothGATTC::EventHandler(esp_gattc_cb_event_t event,
                                        esp_gatt_if_t gattc_if,
                                        esp_ble_gattc_cb_param_t *param)
   {
-  for (esp32bluetoothClientApp* app : m_apps)
+  for (auto app_generic : m_apps)
     {
+    esp32bluetoothClientApp* app = static_cast<esp32bluetoothClientApp*>(app_generic);
+    if(!app->m_active)
+    {
+      continue;
+    }
     if (event == ESP_GATTC_REG_EVT)
       {
       // Store the gattc_if for the registered app
@@ -488,8 +493,12 @@ void esp32bluetoothGATTC::EventHandler(esp_gattc_cb_event_t event,
 
 void esp32bluetoothGATTC::RegisterAllApps()
   {
-  for (esp32bluetoothClientApp* app : m_apps)
+  for (auto app : m_apps)
     {
+    if(!app->m_active)
+    {
+      continue;
+    }
     esp_err_t ret = esp_ble_gattc_app_register(app->m_app_id);
     if (ret)
       {
@@ -505,8 +514,13 @@ void esp32bluetoothGATTC::RegisterAllApps()
 
 void esp32bluetoothGATTC::UnregisterAllApps()
   {
-  for (esp32bluetoothClientApp* app : m_apps)
+  for (auto app_generic : m_apps)
     {
+    esp32bluetoothClientApp* app = static_cast<esp32bluetoothClientApp*>(app_generic);
+    if(!app->m_active)
+    {
+      continue;
+    }
     esp_err_t ret = esp_ble_gattc_app_unregister(app->m_gatt_if);
     if (ret)
       {
@@ -524,6 +538,6 @@ void esp32bluetoothGATTC::UnregisterAllApps()
 
 void esp32bluetoothGATTC::RegisterApp(esp32bluetoothClientApp* app)
   {
-  m_apps.push_back(app);
+  m_apps.push_back(static_cast<esp32bluetoothApp*>(app));
   app->m_app_slot = m_apps.size()-1;
   }
