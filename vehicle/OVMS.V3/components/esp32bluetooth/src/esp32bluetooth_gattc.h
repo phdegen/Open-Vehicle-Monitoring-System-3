@@ -82,7 +82,6 @@ class esp32bluetoothGATTC : public esp32bluetoothGATT
     void RegisterApp(esp32bluetoothClientApp* app);
 
   public:
-    std::vector<esp32bluetoothClientApp*> m_apps;
     esp_ble_scan_params_t m_scan_params;
   
   };
