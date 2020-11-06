@@ -438,6 +438,13 @@ void bluetooth_gattc_app_info(int verbosity, OvmsWriter* writer, OvmsCommand* cm
     bluetooth_gatt_app_info(static_cast<esp32bluetoothGATT*>(&MyBluetoothGATTC),verbosity,writer,cmd,argc,argv);
   }
 
+void bluetooth_rerun_gattc_scan(int verbosity, OvmsWriter* writer, OvmsCommand* cmd, int argc, const char* const* argv)
+  {
+    MyBluetoothGAP.RerunGATTCScan();
+  }
+
+
+  
 class esp32bluetoothInit
   {
   public: esp32bluetoothInit();
@@ -457,6 +464,7 @@ esp32bluetoothInit::esp32bluetoothInit()
   OvmsCommand* cmd_ble_gattc = cmd_bt->RegisterCommand("gattc", "Set ble gatt client active configuration", bluetooth_set_gattc_active);
   cmd_ble_gatts->RegisterCommand("active", "Set ble gatt server active configuration", bluetooth_set_gatts_active, "true/false",0,1);
   cmd_ble_gattc->RegisterCommand("active", "Set ble gatt client active configuration", bluetooth_set_gattc_active, "true/false",0,1);
+  cmd_ble_gattc->RegisterCommand("scan","rerun scan for active app device", bluetooth_rerun_gattc_scan);
   
   OvmsCommand* cmd_gatts_apps = cmd_ble_gatts->RegisterCommand("app", "list gatts apps with status", bluetooth_list_gatts_apps);
   OvmsCommand* cmd_gattc_apps = cmd_ble_gattc->RegisterCommand("app", "list gattc apps with status", bluetooth_list_gattc_apps);

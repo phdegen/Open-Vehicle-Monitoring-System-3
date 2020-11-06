@@ -318,7 +318,7 @@ void esp32bluetoothGAP::GATTCEventHandler(esp_gap_ble_cb_event_t event,
     switch (event) {
     case ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT: {
         //the unit of the duration is second
-        uint32_t duration = 10;
+        uint32_t duration = 5;
         esp_ble_gap_start_scanning(duration);
         break;
     }
@@ -404,3 +404,16 @@ void esp32bluetoothGAP::GATTCEventHandler(esp_gap_ble_cb_event_t event,
     }
 
   }
+
+void esp32bluetoothGAP::RerunGATTCScan(){
+  if(!m_gattc_active)
+  {
+    ESP_LOGI(TAG, "doesnt rerun gattc scan since gattc is disabled!");
+  }
+  else
+  {
+    uint32_t duration = 5;
+    esp_ble_gap_start_scanning(duration);
+  }
+  
+}
