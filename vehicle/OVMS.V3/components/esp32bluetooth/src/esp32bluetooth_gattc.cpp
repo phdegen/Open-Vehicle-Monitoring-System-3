@@ -256,6 +256,21 @@ void esp32bluetoothClientApp::EventValueUpdate(int char_num)
   {
   }
 
+void esp32bluetoothClientApp::WriteCharByte(int characteristic_idx, uint8_t data)
+{
+  m_characteristics[characteristic_idx]->m_value_buffer[0] = data;
+  uint8_t write_char_data[2];
+  write_char_data[0] = data;
+
+  esp_ble_gattc_write_char(m_gatt_if, m_conn_id, m_characteristics[characteristic_idx]->m_char_handle,1,write_char_data,
+                          ESP_GATT_WRITE_TYPE_RSP, ESP_GATT_AUTH_REQ_NONE);
+}
+
+void esp32bluetoothClientApp::TriggerReadChar(int characteristic_idx)
+{
+  esp_ble_gattc_read_char(m_gatt_if, m_conn_id, m_characteristics[characteristic_idx]->m_char_handle, ESP_GATT_AUTH_REQ_NONE);
+}
+
 ////////////////////////////////////////////////////////////////////////
 // esp32bluetoothGATTC
 
