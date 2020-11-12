@@ -444,6 +444,190 @@ void bluetooth_rerun_gattc_scan(int verbosity, OvmsWriter* writer, OvmsCommand* 
   }
 
 
+#ifdef CONFIG_OVMS_SC_JAVASCRIPT_DUKTAPE
+
+
+static duk_ret_t DukGATTCScan(duk_context *ctx)
+  {
+    if(!MyBluetoothGAP.m_gattc_active){
+      duk_push_boolean(ctx,0);
+    }
+    else
+    {
+      MyBluetoothGAP.RerunGATTCScan();
+      duk_push_boolean(ctx,1);
+    }
+  return 1;
+    
+  }
+
+static duk_ret_t DukGATTCAppNamesList(duk_context *ctx)
+  {
+
+    duk_idx_t app_name_arr_idx = duk_push_array(ctx);
+
+    for(int app_idx=0;app_idx < MyBluetoothGATTC.m_apps.size();app_idx++)
+    {
+      auto app = MyBluetoothGATTC.m_apps[app_idx];
+
+      const char *name = app->m_name;
+      duk_push_string(ctx, name);
+      duk_put_prop_index(ctx, app_name_arr_idx, app_idx);
+    }
+    return 1;
+  }
+
+static duk_ret_t DukGATTCAppCharacteristicsList(duk_context *ctx)
+  {
+    int gattc_app_idx = duk_to_int(ctx,0);
+    duk_idx_t uuid_str_arr_idx;
+
+    if(gattc_app_idx >= MyBluetoothGATTC.m_apps.size()){
+      duk_push_string(ctx, "");
+      uuid_str_arr_idx = duk_push_array(ctx);
+    }
+    else
+    {
+      auto app = MyBluetoothGATTC.m_apps[gattc_app_idx];
+
+      uuid_str_arr_idx = duk_push_array(ctx);
+
+      int num_chars = app->m_characteristics.size();
+      for (int i = 0; i < num_chars; i++)
+      {
+        auto uuid = app->m_characteristics[i]->m_char_uuid;
+        uint8_t *uuid_p = NULL;
+        switch (uuid.len)
+        {
+        case ESP_UUID_LEN_16:
+          uuid_p = (uint8_t *)&(uuid.uuid.uuid16);
+          break;
+        case ESP_UUID_LEN_32:
+          uuid_p = (uint8_t *)&(uuid.uuid.uuid32);
+          break;
+        case ESP_UUID_LEN_128:
+          uuid_p = uuid.uuid.uuid128;
+          break;
+        default:
+          break;
+        }
+        char uuid_str[40];
+        const char *uuid_str_chararr = uuid_str;
+        char *running_str_p = uuid_str;
+        for (int k = 1; k <= uuid.len; k++)
+        {
+          running_str_p = HexByte(running_str_p, *(uuid_p + uuid.len - k));
+        }
+        std::string hex_uuid_str = std::string(uuid_str_chararr, 2 * uuid.len);
+
+        duk_push_string(ctx, hex_uuid_str.c_str());
+        duk_put_prop_index(ctx, uuid_str_arr_idx, i);
+      }
+    }
+    return 1;
+  }
+
+  static duk_ret_t DukGATTCAppStatus(duk_context *ctx)
+  {
+    int gattc_app_idx = duk_to_int(ctx, 0);
+
+    if (gattc_app_idx >= MyBluetoothGATTC.m_apps.size())
+    {
+      duk_push_boolean(ctx, 0);
+    }
+    else
+    {
+      auto app = static_cast<esp32bluetoothClientApp *>(MyBluetoothGATTC.m_apps[gattc_app_idx]);
+
+      bool app_conn_status = app->m_ble_connected;
+
+      duk_push_boolean(ctx, app_conn_status);
+    }
+    return 1;
+  }
+
+  static duk_ret_t DukGATTCWriteToByteCharacteristic(duk_context *ctx)
+  {
+    int gattc_app_idx = duk_to_int(ctx,0);
+    if (gattc_app_idx >= MyBluetoothGATTC.m_apps.size())
+    {
+      duk_push_boolean(ctx, 0);
+    }
+    else
+    {
+      int app_char_idx = duk_to_int(ctx, 1);
+      if(app_char_idx >= MyBluetoothGATTC.m_apps[gattc_app_idx]->m_characteristics.size())
+      {
+        duk_push_boolean(ctx, 0);
+      }
+      else
+      {
+        uint8_t char_value = (uint8_t)duk_to_uint16(ctx, 2);
+
+        auto app = static_cast<esp32bluetoothClientApp *>(MyBluetoothGATTC.m_apps[gattc_app_idx]);
+
+        app->WriteCharByte(app_char_idx, char_value);
+
+        duk_push_boolean(ctx,1);
+      }
+    }
+    return 1;
+  }
+
+static duk_ret_t DukGATTCTriggerReadCharacteristic(duk_context *ctx)
+  {
+    int gattc_app_idx = duk_to_int(ctx,0);
+    if (gattc_app_idx >= MyBluetoothGATTC.m_apps.size())
+    {
+      duk_push_boolean(ctx, 0);
+    }
+    else
+    {
+      int app_char_idx = duk_to_int(ctx,1);
+      if(app_char_idx >= MyBluetoothGATTC.m_apps[gattc_app_idx]->m_characteristics.size())
+      {
+        duk_push_boolean(ctx, 0);
+      }
+      else
+      {
+        auto app = static_cast<esp32bluetoothClientApp*>(MyBluetoothGATTC.m_apps[gattc_app_idx]);
+
+        app->TriggerReadChar(app_char_idx);
+        duk_push_boolean(ctx,1);
+      }
+    }
+    return 1;
+  }
+
+static duk_ret_t DukGATTCReadFromByteCharacteristic(duk_context *ctx)
+  {
+    int gattc_app_idx = duk_to_int(ctx, 0);
+    if (gattc_app_idx >= MyBluetoothGATTC.m_apps.size())
+    {
+      duk_push_int(ctx, -1);
+    }
+    else
+    {
+      int app_char_idx = duk_to_int(ctx, 1);
+      if (app_char_idx >= MyBluetoothGATTC.m_apps[gattc_app_idx]->m_characteristics.size())
+      {
+        duk_push_int(ctx, -1);
+      }
+      else
+      {
+        auto app = static_cast<esp32bluetoothClientApp *>(MyBluetoothGATTC.m_apps[gattc_app_idx]);
+
+        uint8_t value = app->m_characteristics[app_char_idx]->m_value_buffer[0];
+
+        duk_push_int(ctx, (int)value);
+      }
+    }
+
+    return 1;
+  }
+
+#endif // #ifdef CONFIG_OVMS_SC_JAVASCRIPT_DUKTAPE
+
   
 class esp32bluetoothInit
   {
@@ -474,5 +658,20 @@ esp32bluetoothInit::esp32bluetoothInit()
   cmd_gattc_apps->RegisterCommand("activate", "activate respective app with index", bluetooth_activeate_gattc_app,"app_idx[int] true/false",2,2);
   cmd_gatts_apps->RegisterCommand("info", "get app info(characteristics) with index", bluetooth_gatts_app_info,"app_idx[int]",1,1);
   cmd_gattc_apps->RegisterCommand("info", "get app info(characteristics) with index", bluetooth_gattc_app_info,"app_idx[int]",1,1);
+
+
+#ifdef CONFIG_OVMS_SC_JAVASCRIPT_DUKTAPE
+  DuktapeObjectRegistration* dto = new DuktapeObjectRegistration("BLEgattc");
+  dto->RegisterDuktapeFunction(DukGATTCScan, 0, "RerunScan");
+  dto->RegisterDuktapeFunction(DukGATTCAppNamesList, 0, "AppNamesList");
+  dto->RegisterDuktapeFunction(DukGATTCAppCharacteristicsList, 1, "AppCharacteristicsList");
+  dto->RegisterDuktapeFunction(DukGATTCAppStatus, 1, "AppStatus");
+  dto->RegisterDuktapeFunction(DukGATTCWriteToByteCharacteristic, 3, "WriteToByteCharacteristic");
+  dto->RegisterDuktapeFunction(DukGATTCTriggerReadCharacteristic, 2, "TriggerCharacteristicRead");
+  dto->RegisterDuktapeFunction(DukGATTCReadFromByteCharacteristic, 2, "ReadByteCharacteristic");
+  MyScripts.RegisterDuktapeObject(dto);
+#endif // #ifdef CONFIG_OVMS_SC_JAVASCRIPT_DUKTAPE
+
+
 
   }
