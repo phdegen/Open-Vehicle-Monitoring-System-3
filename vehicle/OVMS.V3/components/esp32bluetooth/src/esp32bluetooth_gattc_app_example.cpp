@@ -41,9 +41,9 @@ OvmsBluetoothAppGATTCExample::OvmsBluetoothAppGATTCExample()
   {
     ESP_LOGI(TAG, "Initialising Bluetooth GATTC Example App (8018)");
 
-    OvmsCommand* cmd_bt_gattc_app = MyCommandApp.RegisterCommand("bt_gattc_example_app","gattc example app interaction", gattc_app_read_stuff);
+    /*OvmsCommand* cmd_bt_gattc_app = MyCommandApp.RegisterCommand("bt_gattc_example_app","gattc example app interaction", gattc_app_read_stuff);
     cmd_bt_gattc_app->RegisterCommand("write_stuff","write to gattc example app",gattc_app_write_stuff);
-    cmd_bt_gattc_app->RegisterCommand("read_stuff","read from gattc example app",gattc_app_read_stuff);
+    cmd_bt_gattc_app->RegisterCommand("read_stuff","read from gattc example app",gattc_app_read_stuff);*/
 
     m_adv_name = "ExampleApp";
 
@@ -98,21 +98,17 @@ void OvmsBluetoothAppGATTCExample::EventReadChar(esp_ble_gattc_cb_param_t::gattc
 
 void OvmsBluetoothAppGATTCExample::WriteToCharacteristics()
   {
-    uint8_t write_char_data[2];
-
     ESP_LOGI(TAG, "writing stuff ...");
 
-    write_char_data[0] = 0xAB;
-    esp_ble_gattc_write_char(m_gatt_if, m_conn_id, m_example_characteristic_0.m_char_handle,1,write_char_data, ESP_GATT_WRITE_TYPE_RSP, ESP_GATT_AUTH_REQ_NONE);
+    WriteCharByte(0,0xAB);
   }
 
 void OvmsBluetoothAppGATTCExample::ReadFromCharacteristics()
   {
     ESP_LOGI(TAG, "reading stuff ");
 
-    esp_ble_gattc_read_char(m_gatt_if, m_conn_id, m_example_characteristic_0.m_char_handle, ESP_GATT_AUTH_REQ_NONE);
-
-    esp_ble_gattc_read_char(m_gatt_if, m_conn_id, m_example_characteristic_1.m_char_handle, ESP_GATT_AUTH_REQ_NONE);
+    TriggerReadChar(0);
+    TriggerReadChar(1);
   }
 
 void gattc_app_write_stuff(int verbosity, OvmsWriter* writer, OvmsCommand* cmd, int argc, const char* const* argv)

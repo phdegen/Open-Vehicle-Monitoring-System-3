@@ -55,6 +55,9 @@ class esp32bluetoothClientApp : public esp32bluetoothApp
     virtual void EventDisconnect(esp_ble_gattc_cb_param_t::gattc_disconnect_evt_param *disconnect);
 
     virtual void EventValueUpdate(int char_num);
+
+    virtual void WriteCharByte(int characteristic_idx, uint8_t data);
+    virtual void TriggerReadChar(int characteristic_idx);
     
   public:
     uint16_t m_service_end_handle;
