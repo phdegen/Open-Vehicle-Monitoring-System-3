@@ -116,7 +116,7 @@ void esp32bluetoothClientApp::EventSearchComplete(esp_ble_gattc_cb_param_t::gatt
                 /*  Every service should have only one char per uuid so only the first one is taken */
                 if (count > 0 ){
                   if(!characteristic->m_notifying || (char_elem_result[0].properties & ESP_GATT_CHAR_PROP_BIT_NOTIFY)){
-                    ESP_LOGI(TAG, "got characteristic %d(uuid)'s char_handle! ",char_elem_result[0].char_handle);
+                    ESP_LOGI(TAG, "got characteristic w/ char_handle %d! ",char_elem_result[0].char_handle);
                     characteristic->m_char_handle = char_elem_result[0].char_handle;
                     if(characteristic->m_notifying){
                       esp_ble_gattc_register_for_notify (m_gatt_if, characteristic->m_remote_bda, characteristic->m_char_handle);
