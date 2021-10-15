@@ -200,6 +200,11 @@ void Housekeeping::Init(std::string event, void* data)
     MyPeripherals->m_esp32wifi->AutoInit();
 #endif // CONFIG_OVMS_COMP_WIFI
 
+#ifdef CONFIG_OVMS_COMP_BLUETOOTH
+  ESP_LOGI(TAG, "Auto init bluetooth (free: %zu bytes)", heap_caps_get_free_size(MALLOC_CAP_8BIT|MALLOC_CAP_INTERNAL));
+    MyPeripherals->m_esp32bluetooth->AutoInit();
+#endif // #ifdef CONFIG_OVMS_COMP_BLUETOOTH
+
 #ifdef CONFIG_OVMS_COMP_CELLULAR
     ESP_LOGI(TAG, "Auto init modem (free: %zu bytes)", heap_caps_get_free_size(MALLOC_CAP_8BIT|MALLOC_CAP_INTERNAL));
     MyPeripherals->m_cellular_modem->AutoInit();

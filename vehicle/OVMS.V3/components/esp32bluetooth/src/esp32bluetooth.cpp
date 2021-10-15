@@ -37,6 +37,7 @@
 #include "esp_bt.h"
 #include "ovms_peripherals.h"
 #include "ovms_utils.h"
+#include "ovms_events.h"
 
 #include "ovms_log.h"
 static const char *TAG = "bt";
@@ -48,11 +49,23 @@ esp32bluetooth::esp32bluetooth(const char* name)
   m_powermode = Off;
 
   MyConfig.RegisterParam("bt", "Bluetooth BLE Configs", true, true);
-  ConfigChanged(NULL);
+  ConfigChanged("",NULL);
+
+  using std::placeholders::_1;
+  using std::placeholders::_2;
+  MyEvents.RegisterEvent(TAG,"config.mounted", std::bind(&esp32bluetooth::ConfigChanged, this, _1, _2));
+  MyEvents.RegisterEvent(TAG,"config.changed", std::bind(&esp32bluetooth::ConfigChanged, this, _1, _2));
   }
 
 esp32bluetooth::~esp32bluetooth()
   {
+  }
+
+void esp32bluetooth::AutoInit()
+  {
+    if (m_gatts_active || m_gattc_active){
+      SetPowerMode(On);
+    }
   }
 
 void esp32bluetooth::StartService()
@@ -212,14 +225,18 @@ void esp32bluetooth::SetPowerMode(PowerMode powermode)
     };
   }
 
-void esp32bluetooth::ConfigChanged(OvmsConfigParam* param)
+void esp32bluetooth::ConfigChanged(std::string event, void* data)
   {
+  OvmsConfigParam* param = (OvmsConfigParam*)data;
   if (param && param->GetName() != "bt")
     return;
   ESP_LOGD(TAG, "load config");
 
   m_gatts_active = MyConfig.GetParamValueBool("bt", "gatts.active", false);
   m_gattc_active = MyConfig.GetParamValueBool("bt", "gattc.active", false);
+
+  MyBluetoothGAP.m_gattc_active = m_gattc_active;
+  MyBluetoothGAP.m_gatts_active = m_gatts_active;
   }
 
 void bluetooth_status(int verbosity, OvmsWriter* writer, OvmsCommand* cmd, int argc, const char* const* argv)

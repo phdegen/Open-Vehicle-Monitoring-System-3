@@ -49,10 +49,11 @@ class esp32bluetooth : public pcp, public InternalRamAllocated
     ~esp32bluetooth();
 
   public:
+    void AutoInit();
     void StartService();
     void StopService();
     bool IsServiceRunning();
-    void ConfigChanged(OvmsConfigParam* param);
+    void ConfigChanged(std::string event, void* data);
     void SetPowerMode(PowerMode powermode);
 
   public:
