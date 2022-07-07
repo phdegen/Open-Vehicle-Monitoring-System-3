@@ -324,7 +324,7 @@ void OvmsVehicleRenaultZoe::IncomingFrameCan1(CAN_frame_t* p_frame) {
       // 35c,60,61,1,0,0,,,,ff,Parking Brake Status
       break;
     case 0x35d: // Kangoo ignition?
-      car_on((CAN_BYTE(0) == 0x90));
+      //car_on((CAN_BYTE(0) == 0x90));
       break;
     case 0x391:
       // 391,15,15,1,0,0,,,,e2,Climate Cooling Select
