@@ -588,7 +588,7 @@ void OvmsVehicleRenaultZoe::IncomingFrameCan1(CAN_frame_t* p_frame) {
       // 654,3,3,1,0,0,,,,ff,Driver Walk Away Engine ON
       // 654,4,4,1,0,0,,,,ff,HVBatteryUnballastAlert
       // 654,25,31,1,0,0,,,,ff,State of Charge
-      StandardMetrics.ms_v_bat_soc->SetValue(CAN_BYTE(3));
+      StandardMetrics.ms_v_bat_soc->SetValue(CAN_BYTE(3) & 0x7f);
       // 654,32,41,1,0,0,min,,,ff,Time to Full
       //StandardMetrics.ms_v_charge_duration_full->SetValue((UINT(d[4] << 2) | d[5] >> 6) & 1023);
       StandardMetrics.ms_v_charge_duration_full->SetValue((((CAN_UINT(4) >> 6) & 0x3ffu) < 0x3ff) ? (CAN_UINT(4) >> 6) & 0x3ffu : 0);
