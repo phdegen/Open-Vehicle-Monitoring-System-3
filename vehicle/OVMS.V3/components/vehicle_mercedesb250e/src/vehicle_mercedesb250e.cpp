@@ -85,6 +85,9 @@ OvmsVehicleMercedesB250eInit::OvmsVehicleMercedesB250eInit()
 void OvmsVehicleMercedesB250e::IncomingFrameCan1(CAN_frame_t* p_frame)
 {
   uint8_t *d = p_frame->data.u8;
+
+  static bool isCharging = false;
+  static bool lastCharging = false;
    
   switch (p_frame->MsgID) {
   case 0x105: // Motor RPM
@@ -147,6 +150,46 @@ void OvmsVehicleMercedesB250e::IncomingFrameCan1(CAN_frame_t* p_frame)
       if (power < -50) 
         power = -50; // I just guess that maximum recuperation would be 50kW, probably less
       StandardMetrics.ms_v_bat_power->SetValue(power); // kW 
+      uint8_t chrg_plug_encoding = d[5] & 0x3;
+      StandardMetrics.ms_v_door_chargeport->SetValue(chrg_plug_encoding & 0x2);
+      
+      isCharging = (chrg_plug_encoding == 0x2); // ChargeInProgress
+      
+      if (isCharging != lastCharging) { // EVENT charge state changed
+        if (isCharging) { // EVENT started charging
+          // Handle 12Vcharging
+          StandardMetrics.ms_v_env_charging12v->SetValue(true);
+          // Reset charge kWh
+          StandardMetrics.ms_v_charge_kwh->SetValue(0);
+          // Start charging
+          StandardMetrics.ms_v_charge_pilot->SetValue(true);
+          StandardMetrics.ms_v_charge_inprogress->SetValue(isCharging);
+          StandardMetrics.ms_v_charge_mode->SetValue("standard");
+          StandardMetrics.ms_v_charge_type->SetValue("type2");
+          StandardMetrics.ms_v_charge_state->SetValue("charging");
+          StandardMetrics.ms_v_charge_substate->SetValue("onrequest");
+        } else { // EVENT stopped charging
+          // Handle 12Vcharging
+          StandardMetrics.ms_v_env_charging12v->SetValue(false);
+          StandardMetrics.ms_v_charge_pilot->SetValue(false);
+          StandardMetrics.ms_v_charge_inprogress->SetValue(isCharging);
+          StandardMetrics.ms_v_charge_mode->SetValue("standard");
+          StandardMetrics.ms_v_charge_type->SetValue("type2");
+          if (StandardMetrics.ms_v_bat_soc->AsInt() < 95) {
+            // Assume the charge was interrupted
+            ESP_LOGI(TAG,"Car charge session was interrupted");
+            StandardMetrics.ms_v_charge_state->SetValue("stopped");
+            StandardMetrics.ms_v_charge_substate->SetValue("interrupted");
+          } else {
+            // Assume the charge completed normally
+            ESP_LOGI(TAG,"Car charge session completed");
+            StandardMetrics.ms_v_charge_state->SetValue("done");
+            StandardMetrics.ms_v_charge_substate->SetValue("onrequest");
+          }
+        }
+      }
+      lastCharging = isCharging;
+
       break;
     }	    
   case 0x34E:  // Distance Today , Distance since reset, scale is 0.1 km
