@@ -50,6 +50,8 @@ class OvmsVehicleMercedesB250e : public OvmsVehicle
     OvmsMetricFloat *mt_mb_eco_const;         // eco score on constant driving over last 6 hours
     OvmsMetricFloat *mt_mb_eco_coast;         // eco score on coasting over last 6 hours
     OvmsMetricFloat *mt_mb_eco_score;         // eco score shown on dashboard over last 6 hours
+
+    OvmsMetricFloat *mt_mb_bat_capacity;        // cars battery capacity
     
     OvmsMetricFloat *mt_mb_fl_speed;          // Front Left  wheel speed, km/h
     OvmsMetricFloat *mt_mb_fr_speed;          // Front Right wheel speed, km/h
