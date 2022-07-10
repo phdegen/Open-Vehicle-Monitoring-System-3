@@ -61,6 +61,9 @@ OvmsVehicleMercedesB250e::OvmsVehicleMercedesB250e()
   mt_mb_fr_speed          = MyMetrics.InitFloat("xmb.v.fr_speed", SM_STALE_MIN, 0, Kph);
   mt_mb_rl_speed          = MyMetrics.InitFloat("xmb.v.rl_speed", SM_STALE_MIN, 0, Kph);
   mt_mb_rr_speed          = MyMetrics.InitFloat("xmb.v.rr_speed", SM_STALE_MIN, 0, Kph);
+
+  mt_mb_bat_capacity = MyMetrics.InitFloat("xmb.b.capacity",SM_STALE_MID, 35000, WattHours);
+  StandardMetrics.ms_v_bat_range_full->SetValue(150);
   
   RegisterCanBus(1, CAN_MODE_ACTIVE, CAN_SPEED_500KBPS);
 }
@@ -210,6 +213,11 @@ void OvmsVehicleMercedesB250e::IncomingFrameCan1(CAN_frame_t* p_frame)
       if (range < 2047)
 	StandardMetrics.ms_v_bat_range_est->SetValue((float)range); // km
       mt_mb_consumption_start->SetValue(consumption);
+      if(consumption > 0) {
+        StandardMetrics.ms_v_bat_range_full->SetValue(mt_mb_bat_capacity->AsFloat() / consumption);
+      }
+      if (range < 2047)
+        StandardMetrics.ms_v_bat_soc->SetValue((float)range / 240.0 * 100.0);
       break;
     }
   case 0x3eb: 
