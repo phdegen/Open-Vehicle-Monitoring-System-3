@@ -109,6 +109,25 @@ void esp32bluetooth::StartService()
     return;
     }
 
+  ret = esp_ble_tx_power_set(ESP_BLE_PWR_TYPE_ADV, ESP_PWR_LVL_P9);
+  if (ret)
+    {
+    ESP_LOGE(TAG, "setting ble tx power failed: %s", esp_err_to_name(ret));
+    return;
+    }
+  ret = esp_ble_tx_power_set(ESP_BLE_PWR_TYPE_SCAN, ESP_PWR_LVL_P9);
+  if (ret)
+    {
+    ESP_LOGE(TAG, "enable ble tx power failed: %s", esp_err_to_name(ret));
+    return;
+    }
+  ret = esp_ble_tx_power_set(ESP_BLE_PWR_TYPE_DEFAULT, ESP_PWR_LVL_P9);
+  if (ret)
+    {
+    ESP_LOGE(TAG, "enable ble tx power failed: %s", esp_err_to_name(ret));
+    return;
+    }
+
   if(m_gatts_active)
   {    
     MyBluetoothGATTS.RegisterForEvents();
