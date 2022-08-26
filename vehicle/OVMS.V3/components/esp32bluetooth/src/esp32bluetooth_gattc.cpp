@@ -547,8 +547,9 @@ void esp32bluetoothGATTC::UnregisterAllApps()
     else
       {
       ESP_LOGI(TAG,"App %s unregistered successfully",app->m_name);
-      app->m_ble_connected = false;
-      app->m_connected_to_server = false;
+      esp_ble_gattc_cb_param_t::gattc_disconnect_evt_param disconn_param;
+      disconn_param.reason = ESP_GATT_CONN_TERMINATE_LOCAL_HOST;
+      app->EventDisconnect(&disconn_param);
       }
     }
   }
