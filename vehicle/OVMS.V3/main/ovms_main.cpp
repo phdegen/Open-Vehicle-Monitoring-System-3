@@ -66,3 +66,17 @@ void app_main(void)
   ESP_LOGI(TAG, "Starting HOUSEKEEPING...");
   MyHousekeeping = new Housekeeping();
   }
+
+  extern "C" {
+/***************************************************************************//**
+\brief This function is called by task_wdt_isr function (ISR for when TWDT times out).
+\details It can be redefined in user code to handle twdt events.
+Note: It has the same limitations as the interrupt function.
+Do not use ESP_LOGI functions inside.
+*******************************************************************************/
+void esp_task_wdt_isr_user_handler(void)
+{
+/* restart firmware */
+esp_restart();
+}
+}
