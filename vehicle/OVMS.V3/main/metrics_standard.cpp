@@ -63,6 +63,9 @@ MetricsStandard::MetricsStandard()
   ms_m_egpio_monitor = new OvmsMetricBitset<10,0>(MS_M_EGPIO_MONITOR, SM_STALE_MAX);
 #endif //CONFIG_OVMS_COMP_MAX7317
 
+  ms_m_ota_server = new OvmsMetricString(MS_M_OTA_SERVER);
+  ms_m_ota_tag = new OvmsMetricString(MS_M_OTA_TAG);
+
   ms_s_v2_connected = new OvmsMetricBool(MS_S_V2_CONNECTED);
   ms_s_v2_peers = new OvmsMetricInt(MS_S_V2_PEERS);
 
