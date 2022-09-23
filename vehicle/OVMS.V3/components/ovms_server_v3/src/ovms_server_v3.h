@@ -42,7 +42,7 @@
 
 typedef std::map<std::string, uint32_t> OvmsServerV3ClientMap;
 
-#define MQTT_CONN_NTOPICS 2
+#define MQTT_CONN_NTOPICS 3
 
 class OvmsServerV3 : public OvmsServer
   {
