@@ -66,6 +66,9 @@
 #define MS_M_EGPIO_OUTPUT           "m.egpio.output"
 #endif //CONFIG_OVMS_COMP_MAX7317
 
+#define MS_M_OTA_SERVER             "m.ota.server"
+#define MS_M_OTA_TAG                "m.ota.tag"
+
 #define MS_S_V2_CONNECTED           "s.v2.connected"
 #define MS_S_V2_PEERS               "s.v2.peers"
 
@@ -297,6 +300,9 @@ class MetricsStandard
     OvmsMetricBitset<10,0>* ms_m_egpio_output;            // EGPIO (MAX7317) output port state
     OvmsMetricBitset<10,0>* ms_m_egpio_monitor;           // EGPIO (MAX7317) input monitoring state
 #endif //CONFIG_OVMS_COMP_MAX7317
+
+    OvmsMetricString* ms_m_ota_server;                    // Server URL for metric based ota update
+    OvmsMetricString* ms_m_ota_tag;                       // FW image tag for metric based ota update
 
     OvmsMetricBool*   ms_s_v2_connected;                  // True = V2 server connected [1]
     OvmsMetricInt*    ms_s_v2_peers;                      // V2 clients connected [1]

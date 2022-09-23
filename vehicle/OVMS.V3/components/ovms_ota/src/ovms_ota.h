@@ -57,7 +57,9 @@ class OvmsOTA
 
   public:
     void LaunchAutoFlash(bool force=false);
+    void LaunchAutoFlashMetrics();
     bool AutoFlash(bool force=false);
+    bool AutoFlashMetrics();
     void Ticker600(std::string event, void* data);
 
   public:

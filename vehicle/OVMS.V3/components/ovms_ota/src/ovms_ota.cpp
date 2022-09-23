@@ -468,7 +468,11 @@ void ota_flash_auto(int verbosity, OvmsWriter* writer, OvmsCommand* cmd, int arg
   bool force = (strcmp(cmd->GetName(), "force")==0);
 
   writer->puts("Triggering automatic firmware update...");
-  MyOTA.LaunchAutoFlash(force);
+  if(strcmp(cmd->GetName(), "metrics")==0){
+    MyOTA.LaunchAutoFlashMetrics();
+  } else {
+    MyOTA.LaunchAutoFlash(force);
+  }
   }
 
 void ota_boot(int verbosity, OvmsWriter* writer, OvmsCommand* cmd, int argc, const char* const* argv)
@@ -660,6 +664,7 @@ OvmsOTA::OvmsOTA()
   cmd_otaflash->RegisterCommand("http","OTA flash http",ota_flash_http,"[<url>]",0,1);
   OvmsCommand* cmd_otaflash_auto = cmd_otaflash->RegisterCommand("auto","Automatic regular OTA flash (over web)",ota_flash_auto);
   cmd_otaflash_auto->RegisterCommand("force","…force update (even if server version older)",ota_flash_auto);
+  cmd_otaflash_auto->RegisterCommand("metrics","update from server / destination set in m.ota metrics",ota_flash_auto);
 
   OvmsCommand* cmd_otaboot = cmd_ota->RegisterCommand("boot","OTA boot");
   cmd_otaboot->RegisterCommand("factory","Boot from factory image",ota_boot);
@@ -775,6 +780,28 @@ static void OTAFlashTask(void *pvParameters)
   vTaskDelete(NULL);
   }
 
+static void OTAMetricsFlashTask(void *pvParameters)
+  {
+
+  ESP_LOGD(TAG, "MetricsAutoFlash: Tasks is running");
+
+  bool result = MyOTA.AutoFlashMetrics();
+
+  if (result)
+    {
+    // Flash has completed. We now need to reboot
+    vTaskDelay(pdMS_TO_TICKS(5000));
+
+    // All done. Let's restart...
+    ESP_LOGI(TAG, "AutoFlash: Complete. Requesting restart...");
+    MyBoot.Restart();
+    MyBoot.SetFirmwareUpdate();
+    }
+
+  MyOTA.m_autotask = NULL;
+  vTaskDelete(NULL);
+  }
+
 void OvmsOTA::LaunchAutoFlash(bool force)
   {
   if (m_autotask != NULL)
@@ -785,6 +812,18 @@ void OvmsOTA::LaunchAutoFlash(bool force)
 
   xTaskCreatePinnedToCore(OTAFlashTask, "OVMS AutoFlash",
     6144, (void*)force, 5, &m_autotask, CORE(1));
+  }
+
+void OvmsOTA::LaunchAutoFlashMetrics()
+  {
+  if (m_autotask != NULL)
+    {
+    ESP_LOGW(TAG, "AutoFlash: Task already running (cannot launch new)");
+    return;
+    }
+
+  xTaskCreatePinnedToCore(OTAMetricsFlashTask, "OVMS AutoFlash",
+    6144, NULL, 5, &m_autotask, CORE(1));
   }
 
 bool OvmsOTA::AutoFlash(bool force)
@@ -896,6 +935,90 @@ bool OvmsOTA::AutoFlash(bool force)
   ESP_LOGI(TAG, "AutoFlash: Success flash of %d bytes from %s", http.GetBodySize(), url.c_str());
   MyNotify.NotifyStringf("info", "ota.update", "OTA firmware %s has been updated (OVMS will restart)", info.version_server.c_str());
   MyConfig.SetParamValue("ota", "http.mru", url);
+
+  return true;
+  }
+
+bool OvmsOTA::AutoFlashMetrics()
+  {
+  const esp_partition_t *running = esp_ota_get_running_partition();
+  const esp_partition_t *target = esp_ota_get_next_update_partition(running);
+
+  if (running==NULL)
+    {
+    ESP_LOGW(TAG, "AutoFlash: Current running image cannot be determined - aborting");
+    m_lastcheckday = -1; // Allow to try again within the same day
+    return false;
+    }
+
+  if (target==NULL)
+    {
+    ESP_LOGW(TAG, "AutoFlash: Target partition cannot be determined - aborting");
+    m_lastcheckday = -1; // Allow to try again within the same day
+    return false;
+    }
+
+  if (running == target)
+    {
+    ESP_LOGW(TAG, "AutoFlash: Cannot flash to running image partition");
+    m_lastcheckday = -1; // Allow to try again within the same day
+    return false;
+    }
+
+  OvmsMutexLock m_lock(&m_flashing,0);
+  if (!m_lock.IsLocked())
+    {
+    ESP_LOGW(TAG, "AutoFlash: Flash operation already in progress - cannot auto flash");
+    m_lastcheckday = -1; // Allow to try again within the same day
+    return false;
+    }
+  OvmsMetric* m_url = MyMetrics.Find(MS_M_OTA_SERVER);
+  std::string url = m_url->AsString();
+
+  OvmsMetric* m_tag = MyMetrics.Find(MS_M_OTA_TAG);
+  std::string tag = m_tag->AsString();
+  if (url.empty())
+    url = "https://dev.veiu-tech.com/downloads";
+
+  if (!tag.empty()){
+    url.append("/");
+    url.append(tag);
+  }
+    
+  url.append("/ovms3.bin");
+
+  ESP_LOGI(TAG, "AutoFlash: Update %s to %s (%s)",
+    target->label,
+    tag.c_str(),
+    url.c_str());
+  MyNotify.NotifyStringf("info", "ota.update", "New OTA firmware %s is now being downloaded", tag.c_str());
+
+  // Download and flash...
+  OvmsOTAWriter http(target, NULL);
+  if (!http.Request(url))
+    {
+    ESP_LOGE(TAG, "AutoFlash: HTTP Request failed: %s", http.GetError().c_str());
+    m_lastcheckday = -1; // Allow to try again within the same day
+    return false;
+    }
+
+  if (http.HasError())
+    {
+    m_lastcheckday = -1; // Allow to try again within the same day
+    return false;
+    }
+
+  // All done
+  ESP_LOGI(TAG, "AutoFlash: Setting boot partition...");
+  esp_err_t err = esp_ota_set_boot_partition(target);
+  if (err != ESP_OK)
+    {
+    ESP_LOGE(TAG, "AutoFlash: ESP32 error #%d setting boot partition - check before rebooting", err);
+    return false;
+    }
+
+  ESP_LOGI(TAG, "AutoFlash: Success flash of %d bytes from %s", http.GetBodySize(), url.c_str());
+  MyNotify.NotifyStringf("info", "ota.update", "OTA firmware %s has been updated (OVMS will restart)", tag.c_str());
 
   return true;
   }
