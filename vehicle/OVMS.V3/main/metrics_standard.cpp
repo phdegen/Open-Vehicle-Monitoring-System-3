@@ -64,6 +64,9 @@ MetricsStandard::MetricsStandard()
 #endif //CONFIG_OVMS_COMP_MAX7317
   ms_m_obd2ecu_on = new OvmsMetricBool(MS_M_OBD2ECU_ON, SM_STALE_MID);
 
+  ms_m_ota_server = new OvmsMetricString(MS_M_OTA_SERVER);
+  ms_m_ota_tag = new OvmsMetricString(MS_M_OTA_TAG);
+
   ms_s_v2_connected = new OvmsMetricBool(MS_S_V2_CONNECTED);
   ms_s_v2_peers = new OvmsMetricInt(MS_S_V2_PEERS);
 
