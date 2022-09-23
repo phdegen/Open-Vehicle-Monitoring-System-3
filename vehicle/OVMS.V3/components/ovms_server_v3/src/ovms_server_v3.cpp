@@ -41,6 +41,7 @@ static const char *TAG = "ovms-server-v3";
 #if CONFIG_MG_ENABLE_SSL
 #include "ovms_tls.h"
 #endif
+#include "ovms_ota.h"
 
 OvmsServerV3 *MyOvmsServerV3 = NULL;
 size_t MyOvmsServerV3Modifier = 0;
@@ -510,6 +511,25 @@ void OvmsServerV3::IncomingMsg(std::string topic, std::string payload)
           }
         }
       }
+    else if(topic.compare(0,4,"ota/")==0)
+      {
+        topic = topic.substr(4);
+        if(topic == "server")
+        {
+          StandardMetrics.ms_m_ota_server->SetValue(payload);
+        }
+        else if(topic == "tag")
+        {
+          StandardMetrics.ms_m_ota_tag->SetValue(payload);
+        }
+        else if(topic == "start")
+        {
+          if(payload == "go")
+          {
+            MyOTA.AutoFlashMetrics();
+          }
+        }
+      }
     }
   }
 
@@ -654,6 +674,9 @@ void OvmsServerV3::Connect()
 
   m_conn_topic[1] = std::string(m_topic_prefix);
   m_conn_topic[1].append("client/+/command/+");
+
+  m_conn_topic[2] = std::string(m_topic_prefix);
+  m_conn_topic[2].append("ota/+");
 
   if (m_port.empty())
     {
