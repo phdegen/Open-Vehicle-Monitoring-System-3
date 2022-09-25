@@ -519,7 +519,8 @@ void OvmsServerV3::IncomingMsg(std::string topic, std::string payload)
         {
           if(payload == "go")
           {
-            MyOTA.AutoFlashMetrics();
+            //workaround in order to run http req from other task/thread
+            RunCommand("internal", "0", "ota flash auto metrics");
           }
         }
       }
