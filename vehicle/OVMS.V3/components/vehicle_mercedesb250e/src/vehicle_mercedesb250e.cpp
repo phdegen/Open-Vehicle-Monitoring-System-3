@@ -203,6 +203,7 @@ void OvmsVehicleMercedesB250e::IncomingFrameCan1(CAN_frame_t* p_frame)
 	mt_mb_trip_start->SetValue(trip_start * 0.1); 
       if (trip_reset < 0xfffffe) 
         mt_mb_trip_reset->SetValue(trip_reset * 0.1);
+        break;
     }      
   case 0x34F: // Range
     {
@@ -217,7 +218,7 @@ void OvmsVehicleMercedesB250e::IncomingFrameCan1(CAN_frame_t* p_frame)
         StandardMetrics.ms_v_bat_range_full->SetValue(mt_mb_bat_capacity->AsFloat() / consumption);
       }
       if (range < 2047)
-        StandardMetrics.ms_v_bat_soc->SetValue((float)range / 240.0 * 100.0);
+        StandardMetrics.ms_v_bat_soc->SetValue((float)range / 220.0 * 100.0);
       break;
     }
   case 0x3eb: 
