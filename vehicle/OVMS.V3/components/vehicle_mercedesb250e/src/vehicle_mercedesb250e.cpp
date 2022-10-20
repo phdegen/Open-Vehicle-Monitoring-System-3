@@ -105,7 +105,10 @@ void OvmsVehicleMercedesB250e::IncomingFrameCan1(CAN_frame_t* p_frame)
       float speed = ( ((d[0]&0xf) << 8) + d[1] ) * 0.1; 
       float odo   = ( (d[5] << 16) + (d[6] << 8) + (d[7]) ) * 0.1;
       StandardMetrics.ms_v_pos_speed->SetValue(speed); // speed in km/h
-      StandardMetrics.ms_v_pos_odometer->SetValue(odo); // ODO km
+      //condition since some invalid frames with 0xFF,0xFF,0xFF come in
+      if(d[5]<128) {
+        StandardMetrics.ms_v_pos_odometer->SetValue(odo); // ODO km
+      }
       break;
     }
   case 0x203: // Wheel speeds
