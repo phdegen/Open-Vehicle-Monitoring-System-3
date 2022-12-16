@@ -220,8 +220,13 @@ void OvmsVehicleMercedesB250e::IncomingFrameCan1(CAN_frame_t* p_frame)
       if(consumption > 0) {
         StandardMetrics.ms_v_bat_range_full->SetValue(mt_mb_bat_capacity->AsFloat() / consumption);
       }
-      if (range < 2047)
-        StandardMetrics.ms_v_bat_soc->SetValue((float)range / 220.0 * 100.0);
+      break;
+    }
+  case 0x387: // SOC
+    {
+      float soc = (float)(d[0]&0x7)*256 + (float)d[1];
+      soc = 0.1 * soc;
+      StandardMetrics.ms_v_bat_soc->SetValue(soc, Percentage);
       break;
     }
   case 0x3eb: 
