@@ -1240,31 +1240,91 @@ bool OvmsOTA::AutoFlashMetrics()
     url.c_str());
   MyNotify.NotifyStringf("info", "ota.update", "New OTA firmware %s is now being downloaded", tag.c_str());
 
-  // Download and flash...
-  OvmsOTAWriter http(target, NULL);
-  if (!http.Request(url))
+  // HTTP client request...
+  OvmsHttpClient http(url);
+  if (!http.IsOpen())
     {
-    ESP_LOGE(TAG, "AutoFlash: HTTP Request failed: %s", http.GetError().c_str());
+    ESP_LOGE(TAG, "AutoFlash: http://%s request failed", url.c_str());
     m_lastcheckday = -1; // Allow to try again within the same day
     return false;
     }
 
-  if (http.HasError())
+  size_t expected = http.BodySize();
+  if (expected < 32)
     {
+    ESP_LOGE(TAG, "AutoFlash: Expected download file size (%d) is invalid", expected);
     m_lastcheckday = -1; // Allow to try again within the same day
+    return false;
+    }
+
+  SetFlashStatus("OTA Auto Flash: Preparing flash partition...",0,true);
+  esp_ota_handle_t otah;
+  esp_err_t err = esp_ota_begin(target, expected, &otah);
+  if (err != ESP_OK)
+    {
+    ClearFlashStatus();
+    ESP_LOGE(TAG, "AutoFlash: ESP32 error #%d when starting OTA operation", err);
+    http.Disconnect();
+    return false;
+    }
+
+  // Now, process the body
+  SetFlashStatus("OTA Auto Flash: Downloading OTA image...");
+  uint8_t rbuf[512];
+  size_t filesize = 0;
+  while (int k = http.BodyRead(rbuf,512))
+    {
+    filesize += k;
+    SetFlashPerc((filesize*100)/expected);
+    if (filesize > target->size)
+      {
+      ClearFlashStatus();
+      ESP_LOGE(TAG, "AutoFlash: Download firmware is bigger than available partition space - state is inconsistent");
+      esp_ota_end(otah);
+      http.Disconnect();
+      return false;
+      }
+    err = esp_ota_write(otah, rbuf, k);
+    if (err != ESP_OK)
+      {
+      ClearFlashStatus();
+      ESP_LOGE(TAG, "AutoFlash: ESP32 error #%d when writing to flash - state is inconsistent", err);
+      esp_ota_end(otah);
+      http.Disconnect();
+      return false;
+      }
+    }
+  http.Disconnect();
+  ESP_LOGI(TAG, "AutoFlash:: Download complete (at %d bytes)", filesize);
+
+  if (filesize != expected)
+    {
+    ClearFlashStatus();
+    ESP_LOGE(TAG, "AutoFlash: Download file size (%d) does not match expected (%d)", filesize, expected);
+    esp_ota_end(otah);
+    m_lastcheckday = -1; // Allow to try again within the same day
+    return false;
+    }
+
+  SetFlashStatus("OTA Auto Flash: Finalising flash partition...");
+  err = esp_ota_end(otah);
+  ClearFlashStatus();
+  if (err != ESP_OK)
+    {
+    ESP_LOGE(TAG, "AutoFlash: ESP32 error #%d finalising OTA operation - state is inconsistent", err);
     return false;
     }
 
   // All done
   ESP_LOGI(TAG, "AutoFlash: Setting boot partition...");
-  esp_err_t err = esp_ota_set_boot_partition(target);
+  err = esp_ota_set_boot_partition(target);
   if (err != ESP_OK)
     {
     ESP_LOGE(TAG, "AutoFlash: ESP32 error #%d setting boot partition - check before rebooting", err);
     return false;
     }
 
-  ESP_LOGI(TAG, "AutoFlash: Success flash of %d bytes from %s", http.GetBodySize(), url.c_str());
+  ESP_LOGI(TAG, "AutoFlash: Success flash of %d bytes from %s", http.BodySize(), url.c_str());
   MyNotify.NotifyStringf("info", "ota.update", "OTA firmware %s has been updated (OVMS will restart)", tag.c_str());
 
   return true;
