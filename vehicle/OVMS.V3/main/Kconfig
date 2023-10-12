@@ -577,6 +577,13 @@ config OVMS_VEHICLE_BYD_ATTO3
     help
         Enable support for BYD Atto 3
 
+config OVMS_VEHICLE_PEUGEOT_EEXPERT
+    bool "Include support for Peugeot e-Expert vehicle"
+    default n
+    depends on OVMS
+    help
+        Enable to include support for Peugeot e-Expert vehicle.
+
 config OVMS_VEHICLE_RXTASK_STACK
     int "Stack size for vehicle RX task"
     default 6144
