@@ -584,6 +584,13 @@ config OVMS_VEHICLE_PEUGEOT_EEXPERT
     help
         Enable to include support for Peugeot e-Expert vehicle.
 
+config OVMS_VEHICLE_VW_ID3
+    bool "Include support for VW ID.3 vehicle"
+    default n
+    depends on OVMS
+    help
+        Enable to include support for VW ID.3 vehicle.
+
 config OVMS_VEHICLE_RXTASK_STACK
     int "Stack size for vehicle RX task"
     default 6144
