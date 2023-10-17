@@ -61,12 +61,11 @@ class OvmsVehicleVWID3 : public OvmsVehicle {
 
 
 	protected:
-		void IncomingINV(uint16_t type, uint16_t pid, const char* data, uint16_t len);
-		void IncomingEVC(uint16_t type, uint16_t pid, const char* data, uint16_t len);
-		void IncomingBCM(uint16_t type, uint16_t pid, const char* data, uint16_t len);
-		void IncomingLBC(uint16_t type, uint16_t pid, const char* data, uint16_t len);
-    void IncomingHVAC(uint16_t type, uint16_t pid, const char* data, uint16_t len);
-    void IncomingUCM(uint16_t type, uint16_t pid, const char* data, uint16_t len);
+    void IncomingBMS(uint16_t type, uint16_t pid, const char* data, uint16_t len);
+    void IncomingECU1(uint16_t type, uint16_t pid, const char* data, uint16_t len);
+    void IncomingECU2(uint16_t type, uint16_t pid, const char* data, uint16_t len);
+    void IncomingECU3(uint16_t type, uint16_t pid, const char* data, uint16_t len);
+    void IncomingECU4(uint16_t type, uint16_t pid, const char* data, uint16_t len);
     
     		
     // VW ID3 specific metrics

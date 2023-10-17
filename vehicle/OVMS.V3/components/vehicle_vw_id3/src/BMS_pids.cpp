@@ -27,11 +27,29 @@
 
 void OvmsVehicleVWID3::IncomingBCM(uint16_t type, uint16_t pid, const char* data, uint16_t len) {  
   switch (pid) {
-    case 0x6300:  // TPMS pressure - front left
-      if ((CAN_UINT(0) * 7.5) < 7672) {
-        StandardMetrics.ms_v_tpms_pressure->SetElemValue(MS_V_TPMS_IDX_FL, (float)CAN_UINT(0) * 7.5 / 10, kPa);
-      }
-      //ESP_LOGD(TAG, "6300 BCM tpms pressure FL: %f", CAN_UINT(0) * 7.5);
+    case 0x028C:  // SOC (BMS)
+      StandardMetrics.ms_v_bat_soc->SetValue((float)CAN_UINT(4) /2.5, Percentage);
+      //ESP_LOGD(TAG, "0x028C ms_v_bat_soc: %f", CAN_UINT(4) /2.5);
+      break;
+    
+    case 0xF40D:
+      StandardMetrics.ms_v_pos_speed->SetValue((float)CAN_UINT(4), Kph);
+      //ESP_LOGD(TAG, "0xF40D ms_v_pos_speed: %d", CAN_UINT(4));
+      break;
+
+    case 0x1E3B:
+      StandardMetrics.ms_v_bat_voltage->SetValue((float)CAN_UINT16(4) / 4, Volts);
+      //ESP_LOGD(TAG, "0x1E3B ms_v_bat_voltage: %f", CAN_UINT16(4) / 4);
+      break;
+
+    case 0x1E3D:
+      StandardMetrics.ms_v_bat_current->SetValue((float)CAN_UINT32(4) - 150000 / 100, Amps);
+      //ESP_LOGD(TAG, "0x1E3D ms_v_bat_current: %f", CAN_UINT32(4) - 150000 / 100);
+      break;
+
+    case 0x2A0B:
+      StandardMetrics.ms_v_bat_temp->SetValue((float)CAN_UINT(4)/2 - 40, Celcius);
+      //ESP_LOGD(TAG, "0x2A0B ms_v_bat_temp: %f", CAN_UINT(4)/2 - 40);
       break;
 
     default: {

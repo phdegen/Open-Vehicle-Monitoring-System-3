@@ -125,14 +125,27 @@ void OvmsVehicleVWID3::IncomingPollReply(canbus* bus, uint16_t type, uint16_t pi
     return;
   
 	switch (m_poll_moduleid_low) {
-    // ****** EVC *****
-		case 0x18daf1da:
-			IncomingEVC(type, pid, rxbuf.data(), rxbuf.size());
-			break;
-    // ****** BCM *****
-    case 0x765:
-      IncomingBCM(type, pid, rxbuf.data(), rxbuf.size());
+    // ****** BMS *****
+    case 0x17FC7B00:
+      IncomingBMS(type, pid, rxbuf.data(), rxbuf.size());
       break;
+    // ****** ECU 1 *****
+		case 0x17FC7600:
+			IncomingECU1(type, pid, rxbuf.data(), rxbuf.size());
+			break;
+    // ****** ECU 2 *****
+		case 0x00006707:
+			IncomingECU2(type, pid, rxbuf.data(), rxbuf.size());
+			break;
+    // ****** ECU 3 *****
+		case 0x00004607:
+			IncomingECU3(type, pid, rxbuf.data(), rxbuf.size());
+			break;
+    // ****** ECU 4 *****
+		case 0x00001007:
+			IncomingECU4(type, pid, rxbuf.data(), rxbuf.size());
+			break;
+    
 	}
 }
 
