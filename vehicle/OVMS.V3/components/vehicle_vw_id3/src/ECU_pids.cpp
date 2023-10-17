@@ -33,7 +33,12 @@ void OvmsVehicleVWID3::IncomingECU1(uint16_t type, uint16_t pid, const char* dat
       break;
     }
     case 0xF802: {
-      StandardMetrics.ms_v_vin->SetValue((float) CAN_UINT32(4), Other);
+      id3_vin[0] = CAN_BYTE(4);
+      id3_vin[1] = CAN_BYTE(5);
+      id3_vin[2] = CAN_BYTE(6);
+      id3_vin[3] = CAN_BYTE(7);
+      id3_vin[4] = 0;
+      StandardMetrics.ms_v_vin->SetValue(id3_vin, Other);
       //ESP_LOGD(TAG, "0xF802 ECU ms_v_vin: %d", CAN_UINT32(4));
       break;
     }

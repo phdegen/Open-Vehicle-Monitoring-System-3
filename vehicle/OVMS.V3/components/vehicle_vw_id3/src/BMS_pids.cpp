@@ -25,7 +25,10 @@
 
 #include "vehicle_vw_id3.h"
 
-void OvmsVehicleVWID3::IncomingBCM(uint16_t type, uint16_t pid, const char* data, uint16_t len) {  
+void OvmsVehicleVWID3::IncomingBMS(uint16_t type, uint16_t pid, const char* data, uint16_t len) {  
+
+  int car_mode;
+  
   switch (pid) {
     case 0x028C:  // SOC (BMS)
       StandardMetrics.ms_v_bat_soc->SetValue((float)CAN_BYTE(4) /2.5, Percentage);
@@ -38,7 +41,7 @@ void OvmsVehicleVWID3::IncomingBCM(uint16_t type, uint16_t pid, const char* data
       break;
     
     case 0x7448:
-      int car_mode = CAN_BYTE(4);
+      car_mode = CAN_BYTE(4);
       if(car_mode == 0) { //standby
         StandardMetrics.ms_v_env_on->SetValue(false);
         StandardMetrics.ms_v_charge_inprogress->SetValue(false);
