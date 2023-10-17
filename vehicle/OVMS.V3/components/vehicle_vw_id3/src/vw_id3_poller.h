@@ -37,8 +37,10 @@ static const OvmsVehicle::poll_pid_t vw_id3_polls[] = {
 
 // BMS
 { 0x17FC007B, 0x17FC7B00, VEHICLE_POLL_TYPE_READDATA, 0x028C, { 10, 10, 10, 10 }, 0, ISOTP_EXTFRAME },  // SoC (BMS) ,%
+//{ 0x17FC007B, 0x17FC7B00, VEHICLE_POLL_TYPE_READDATA, 0xF40C, { 10, 10, 10, 10 }, 0, ISOTP_EXTFRAME },  // motor speed, rpm
 { 0x17FC007B, 0x17FC7B00, VEHICLE_POLL_TYPE_READDATA, 0xF40D, { 10, 10, 10, 10 }, 0, ISOTP_EXTFRAME },  // Speed, km/h
-//{ 0x17FC007B, 0x17FC7B00, VEHICLE_POLL_TYPE_READDATA, 0x7448, { 10, 10, 10, 10 }, 0, ISOTP_EXTFRAME },  // Car operation mode, XX = 0 => standby, XX = 1 => driving, XX = 4 => AC charging, XX = 6 => DC charging
+{ 0x17FC007B, 0x17FC7B00, VEHICLE_POLL_TYPE_READDATA, 0x7448, { 10, 10, 10, 10 }, 0, ISOTP_EXTFRAME },  // Car operation mode, XX = 0 => standby, XX = 1 => driving, XX = 4 => AC charging, XX = 6 => DC charging
+//{ 0x17FC007B, 0x17FC7B00, VEHICLE_POLL_TYPE_READDATA, 0x4219, { 10, 10, 10, 10 }, 0, ISOTP_EXTFRAME },  // HV bat on/off %
 //{ 0x17FC007B, 0x17FC7B00, VEHICLE_POLL_TYPE_READDATA, 0x743B, { 10, 10, 10, 10 }, 0, ISOTP_EXTFRAME },  // cirkulation pump HV battery - flow in %
 //{ 0x17FC007B, 0x17FC7B00, VEHICLE_POLL_TYPE_READDATA, 0x1E33, { 10, 10, 10, 10 }, 0, ISOTP_EXTFRAME },  // HV Battery cell # with highest voltage, V
 //{ 0x17FC007B, 0x17FC7B00, VEHICLE_POLL_TYPE_READDATA, 0x1E34, { 10, 10, 10, 10 }, 0, ISOTP_EXTFRAME },  // HV Battery cell # with lowest  voltage, V
@@ -204,8 +206,11 @@ static const OvmsVehicle::poll_pid_t vw_id3_polls[] = {
 //{ 0x00000746, 0x00004607, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0801, { 10, 10, 10, 10 }, 0, ISOTP_EXTFRAME }, // PTC air heater inside, ampere
 //{ 0x00000746, 0x00004607, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0800, { 10, 10, 10, 10 }, 0, ISOTP_EXTFRAME }, // A/C compressor multiframe
 
-// ECU 4
+// ECU 4 (/ gateway ?)
+//{ 0x00000710, 0x00001007, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x15D5, { 10, 10, 10, 10 }, 0, ISOTP_EXTFRAME }, // Gateway charging active ?
+{ 0x00000710, 0x00001007, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x084F, { 10, 10, 10, 10 }, 0, ISOTP_EXTFRAME }, // Gateway charge plug locked 1= lock
 //{ 0x00000710, 0x00001007, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x2AB2, { 10, 10, 10, 10 }, 0, ISOTP_EXTFRAME }, // HV battery max energy content Wh
+{ 0x00000710, 0x00001007, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x2AB6, { 10, 10, 10, 10 }, 0, ISOTP_EXTFRAME }, // Gateway range display
 ////not confirmed{ 0x00000710, 0x00001007, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x2AB8, { 10, 10, 10, 10 }, 0, ISOTP_EXTFRAME }, // HV battery energy content
 //{ 0x00000710, 0x00001007, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x2AF7, { 10, 10, 10, 10 }, 0, ISOTP_EXTFRAME }, // 12V multiframe
 

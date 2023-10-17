@@ -28,18 +28,46 @@
 void OvmsVehicleVWID3::IncomingBCM(uint16_t type, uint16_t pid, const char* data, uint16_t len) {  
   switch (pid) {
     case 0x028C:  // SOC (BMS)
-      StandardMetrics.ms_v_bat_soc->SetValue((float)CAN_UINT(4) /2.5, Percentage);
-      //ESP_LOGD(TAG, "0x028C ms_v_bat_soc: %f", CAN_UINT(4) /2.5);
+      StandardMetrics.ms_v_bat_soc->SetValue((float)CAN_BYTE(4) /2.5, Percentage);
+      //ESP_LOGD(TAG, "0x028C ms_v_bat_soc: %f", CAN_BYTE(4) /2.5);
       break;
     
     case 0xF40D:
-      StandardMetrics.ms_v_pos_speed->SetValue((float)CAN_UINT(4), Kph);
-      //ESP_LOGD(TAG, "0xF40D ms_v_pos_speed: %d", CAN_UINT(4));
+      StandardMetrics.ms_v_pos_speed->SetValue((float)CAN_BYTE(4), Kph);
+      //ESP_LOGD(TAG, "0xF40D ms_v_pos_speed: %d", CAN_BYTE(4));
+      break;
+    
+    case 0x7448:
+      int car_mode = CAN_BYTE(4);
+      if(car_mode == 0) { //standby
+        StandardMetrics.ms_v_env_on->SetValue(false);
+        StandardMetrics.ms_v_charge_inprogress->SetValue(false);
+      }
+      else if(car_mode == 1) { // driving
+        StandardMetrics.ms_v_env_on->SetValue(true);
+        StandardMetrics.ms_v_charge_inprogress->SetValue(false);
+        StandardMetrics.ms_v_charge_state->SetValue("stopped");
+        StandardMetrics.ms_v_charge_type->SetValue("undefined");
+      }
+      else if(car_mode == 4) { // AC charging
+        StandardMetrics.ms_v_env_on->SetValue(false);
+        StandardMetrics.ms_v_charge_inprogress->SetValue(true);
+        StandardMetrics.ms_v_charge_state->SetValue("charging");
+        StandardMetrics.ms_v_charge_type->SetValue("type2");
+      }
+      else if(car_mode == 6) { // DC charging
+        StandardMetrics.ms_v_env_on->SetValue(false);
+        StandardMetrics.ms_v_charge_inprogress->SetValue(true);
+        StandardMetrics.ms_v_charge_state->SetValue("charging");
+        StandardMetrics.ms_v_charge_type->SetValue("ccs");
+      }
+      
+      //ESP_LOGD(TAG, "0x7448 ms_v_pos_speed: %d", CAN_BYTE(4));
       break;
 
     case 0x1E3B:
-      StandardMetrics.ms_v_bat_voltage->SetValue((float)CAN_UINT16(4) / 4, Volts);
-      //ESP_LOGD(TAG, "0x1E3B ms_v_bat_voltage: %f", CAN_UINT16(4) / 4);
+      StandardMetrics.ms_v_bat_voltage->SetValue((float)CAN_UINT(4) / 4, Volts);
+      //ESP_LOGD(TAG, "0x1E3B ms_v_bat_voltage: %f", CAN_UINT(4) / 4);
       break;
 
     case 0x1E3D:
@@ -48,8 +76,8 @@ void OvmsVehicleVWID3::IncomingBCM(uint16_t type, uint16_t pid, const char* data
       break;
 
     case 0x2A0B:
-      StandardMetrics.ms_v_bat_temp->SetValue((float)CAN_UINT(4)/2 - 40, Celcius);
-      //ESP_LOGD(TAG, "0x2A0B ms_v_bat_temp: %f", CAN_UINT(4)/2 - 40);
+      StandardMetrics.ms_v_bat_temp->SetValue((float)CAN_BYTE(4)/2 - 40, Celcius);
+      //ESP_LOGD(TAG, "0x2A0B ms_v_bat_temp: %f", CAN_BYTE(4)/2 - 40);
       break;
 
     default: {

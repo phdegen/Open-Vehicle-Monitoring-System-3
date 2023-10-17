@@ -74,13 +74,13 @@ void OvmsVehicleVWID3::IncomingECU2(uint16_t type, uint16_t pid, const char* dat
 void OvmsVehicleVWID3::IncomingECU3(uint16_t type, uint16_t pid, const char* data, uint16_t len) {
 	switch (pid) {
     case 0x2613: {  
-      StandardMetrics.ms_v_env_cabintemp->SetValue((float) CAN_UINT16(4)/5-40, Celcius);
-      //ESP_LOGD(TAG, "0x2613 EVC ms_v_env_cabintemp: %f", CAN_UINT16(4)/5-40);
+      StandardMetrics.ms_v_env_cabintemp->SetValue((float) CAN_UINT(4)/5-40, Celcius);
+      //ESP_LOGD(TAG, "0x2613 EVC ms_v_env_cabintemp: %f", CAN_UINT(4)/5-40);
       break;
     }
     case 0x2609: {  
-      StandardMetrics.ms_v_env_temp->SetValue((float) CAN_UINT8(4)/2-50, Celcius);
-      //ESP_LOGD(TAG, "0x2609 EVC ms_v_env_temp: %f", CAN_UINT8(4)/2-50);
+      StandardMetrics.ms_v_env_temp->SetValue((float) CAN_BYTE(4)/2-50, Celcius);
+      //ESP_LOGD(TAG, "0x2609 EVC ms_v_env_temp: %f", CAN_BYTE(4)/2-50);
       break;
     }
 
@@ -101,6 +101,21 @@ void OvmsVehicleVWID3::IncomingECU3(uint16_t type, uint16_t pid, const char* dat
 
 void OvmsVehicleVWID3::IncomingECU4(uint16_t type, uint16_t pid, const char* data, uint16_t len) {
 	switch (pid) {
+    case 0x084F: {  
+      if(CAN_BYTE(4) > 0) {
+        StandardMetrics.ms_v_charge_pilot->SetValue(true);
+      }
+      else {
+        StandardMetrics.ms_v_charge_pilot->SetValue(false);
+      }
+      //ESP_LOGD(TAG, "0x084F EVC ms_v_charge_pilot: %d", CAN_BYTE(4));
+      break;
+    }
+    case 0x2AB6: {  
+      StandardMetrics.ms_v_bat_range_est->SetValue(CAN_UINT(4), Kilometers);
+      //ESP_LOGD(TAG, "0x2AB6 EVC ms_v_bat_range_est: %d", CAN_UINT(4));
+      break;
+    }
 
     default: {
       char *buf = NULL;
