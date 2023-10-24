@@ -31,17 +31,17 @@ void OvmsVehicleVWID3::IncomingBMS(uint16_t type, uint16_t pid, const char* data
   
   switch (pid) {
     case 0x028C:  // SOC (BMS)
-      StandardMetrics.ms_v_bat_soc->SetValue((float)CAN_BYTE(4) /2.5, Percentage);
-      //ESP_LOGD(TAG, "0x028C ms_v_bat_soc: %f", CAN_BYTE(4) /2.5);
+      StandardMetrics.ms_v_bat_soc->SetValue((float)CAN_BYTE(0) /2.5, Percentage);
+      //ESP_LOGD(TAG, "0x028C ms_v_bat_soc: %f", CAN_BYTE(0) /2.5);
       break;
     
     case 0xF40D:
-      StandardMetrics.ms_v_pos_speed->SetValue((float)CAN_BYTE(4), Kph);
-      //ESP_LOGD(TAG, "0xF40D ms_v_pos_speed: %d", CAN_BYTE(4));
+      StandardMetrics.ms_v_pos_speed->SetValue((float)CAN_BYTE(0), Kph);
+      //ESP_LOGD(TAG, "0xF40D ms_v_pos_speed: %d", CAN_BYTE(0));
       break;
     
     case 0x7448:
-      car_mode = CAN_BYTE(4);
+      car_mode = CAN_BYTE(0);
       if(car_mode == 0) { //standby
         StandardMetrics.ms_v_env_on->SetValue(false);
         StandardMetrics.ms_v_charge_inprogress->SetValue(false);
@@ -65,22 +65,22 @@ void OvmsVehicleVWID3::IncomingBMS(uint16_t type, uint16_t pid, const char* data
         StandardMetrics.ms_v_charge_type->SetValue("ccs");
       }
       
-      //ESP_LOGD(TAG, "0x7448 ms_v_pos_speed: %d", CAN_BYTE(4));
+      //ESP_LOGD(TAG, "0x7448 ms_v_pos_speed: %d", CAN_BYTE(0));
       break;
 
     case 0x1E3B:
-      StandardMetrics.ms_v_bat_voltage->SetValue((float)CAN_UINT(4) / 4, Volts);
-      //ESP_LOGD(TAG, "0x1E3B ms_v_bat_voltage: %f", CAN_UINT(4) / 4);
+      StandardMetrics.ms_v_bat_voltage->SetValue((float)CAN_UINT(0) / 4, Volts);
+      //ESP_LOGD(TAG, "0x1E3B ms_v_bat_voltage: %f", CAN_UINT(0) / 4);
       break;
 
     case 0x1E3D:
-      StandardMetrics.ms_v_bat_current->SetValue((float)CAN_UINT32(4) - 150000 / 100, Amps);
-      //ESP_LOGD(TAG, "0x1E3D ms_v_bat_current: %f", CAN_UINT32(4) - 150000 / 100);
+      StandardMetrics.ms_v_bat_current->SetValue((float)CAN_UINT32(0) - 150000 / 100, Amps);
+      //ESP_LOGD(TAG, "0x1E3D ms_v_bat_current: %f", CAN_UINT32(0) - 150000 / 100);
       break;
 
     case 0x2A0B:
-      StandardMetrics.ms_v_bat_temp->SetValue((float)CAN_BYTE(4)/2 - 40, Celcius);
-      //ESP_LOGD(TAG, "0x2A0B ms_v_bat_temp: %f", CAN_BYTE(4)/2 - 40);
+      StandardMetrics.ms_v_bat_temp->SetValue((float)CAN_BYTE(0)/2 - 40, Celcius);
+      //ESP_LOGD(TAG, "0x2A0B ms_v_bat_temp: %f", CAN_BYTE(0)/2 - 40);
       break;
 
     default: {
