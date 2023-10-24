@@ -118,13 +118,13 @@ void OvmsVehicleVWID3::IncomingECU3(uint16_t type, uint16_t pid, const char* dat
 void OvmsVehicleVWID3::IncomingECU4(uint16_t type, uint16_t pid, const char* data, uint16_t len) {
 	switch (pid) {
     case 0x084F: {  
-      if(CAN_BYTE(0) > 0) {
-        StandardMetrics.ms_v_charge_pilot->SetValue(true);
+      if(CAN_BYTE(1) > 0) {
+        StandardMetrics.ms_v_door_chargeport->SetValue(true);
       }
       else {
-        StandardMetrics.ms_v_charge_pilot->SetValue(false);
+        StandardMetrics.ms_v_door_chargeport->SetValue(false);
       }
-      //ESP_LOGD(TAG, "0x084F EVC ms_v_charge_pilot: %d", CAN_BYTE(0));
+      //ESP_LOGD(TAG, "0x084F EVC ms_v_door_chargeport: %d", CAN_BYTE(1));
       break;
     }
     case 0x2AB6: {  
