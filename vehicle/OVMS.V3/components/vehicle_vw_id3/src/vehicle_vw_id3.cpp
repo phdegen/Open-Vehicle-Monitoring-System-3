@@ -73,7 +73,7 @@ OvmsVehicleVWID3::OvmsVehicleVWID3() {
 }
 
 OvmsVehicleVWID3::~OvmsVehicleVWID3() {
-  ESP_LOGI(TAG, "Stop Renault Zoe Ph2 (OBD) vehicle module");
+  ESP_LOGI(TAG, "Stop VW ID.3 vehicle module");
 }
 
 /**
