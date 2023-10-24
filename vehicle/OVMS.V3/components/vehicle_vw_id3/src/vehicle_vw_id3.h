@@ -73,7 +73,7 @@ class OvmsVehicleVWID3 : public OvmsVehicle {
     
   protected:
     string id3_obd_rxbuf;
-    char id3_vin[5] = "";
+    char id3_vin[15] = "";
 };
 
 #endif //#ifndef __VEHICLE_VW_ID3_H__
