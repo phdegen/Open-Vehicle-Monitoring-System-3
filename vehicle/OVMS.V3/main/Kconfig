@@ -590,6 +590,13 @@ config OVMS_VEHICLE_VW_ID3
     depends on OVMS
     help
         Enable to include support for VW ID.3 vehicle.
+        
+config OVMS_VEHICLE_VW_EUP_EGOLF
+    bool "Include support for VW eUP and eGolf vehicle"
+    default n
+    depends on OVMS
+    help
+        Enable to include support for VW eup and egolf vehicle.
 
 config OVMS_VEHICLE_RXTASK_STACK
     int "Stack size for vehicle RX task"
