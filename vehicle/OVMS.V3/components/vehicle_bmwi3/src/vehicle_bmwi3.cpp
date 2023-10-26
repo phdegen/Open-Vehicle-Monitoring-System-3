@@ -2214,7 +2214,8 @@ case I3_PID_EDM_PEDALWERTGEBER: {                                               
 
     unsigned short STAT_LADEKLAPPE = I3_RES_LIM_STAT_LADEKLAPPE;
     ESP_LOGD(TAG, "From ECU %s, pid %s: got %s=%d%s\n", "LIM", "I3_PID_LIM_STATUS_LADEKLAPPE", "STAT_LADEKLAPPE", STAT_LADEKLAPPE, "");
-    StdMetrics.ms_v_door_chargeport->SetValue( (!STAT_LADEKLAPPE) );
+    //VT special: need door cp value to be related to plugged charge plug for connection to charge controller
+    //StdMetrics.ms_v_door_chargeport->SetValue( (!STAT_LADEKLAPPE) );
 
     break;
   }
@@ -2321,6 +2322,8 @@ case I3_PID_EDM_PEDALWERTGEBER: {                                               
         (STAT_STECKER_NR == 2) ? "Connected, unlocked" :
                                  "Invalid state"
     );
+    //VT special: need door cp value to be related to plugged charge plug for connection to charge controller
+    StdMetrics.ms_v_door_chargeport->SetValue(STAT_STECKER_NR);
     mt_i3_v_charge_cablecapacity->SetValue(STAT_STROMTRAGFAEHIGKEIT_WERT, Amps);
 
     break;
