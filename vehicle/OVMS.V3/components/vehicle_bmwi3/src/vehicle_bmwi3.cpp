@@ -148,7 +148,7 @@ static const OvmsVehicle::poll_pid_t obdii_polls[] = {
 
   // LIM: Charging interface module
     { I3_ECU_LIM_TX, I3_ECU_LIM_RX, VEHICLE_POLL_TYPE_OBDIIEXTENDED, I3_PID_LIM_LADEBEREITSCHAFT_LIM,                     {  0, 10, 10, 10 }, 0, ISOTP_EXTADR },   // 0xDEF2 mt_i3_v_charge_readytocharge
-    { I3_ECU_LIM_TX, I3_ECU_LIM_RX, VEHICLE_POLL_TYPE_OBDIIEXTENDED, I3_PID_LIM_PROXIMITY,                                {  0, 10, 10, 10 }, 0, ISOTP_EXTADR },   // 0xDEF5 v_charge_plugstatus
+    { I3_ECU_LIM_TX, I3_ECU_LIM_RX, VEHICLE_POLL_TYPE_OBDIIEXTENDED, I3_PID_LIM_PROXIMITY,                                {  1,  1, 10, 10 }, 0, ISOTP_EXTADR },   // 0xDEF5 v_charge_plugstatus
     { I3_ECU_LIM_TX, I3_ECU_LIM_RX, VEHICLE_POLL_TYPE_OBDIIEXTENDED, I3_PID_LIM_PILOTSIGNAL,                              {  0, 10, 10, 10 }, 0, ISOTP_EXTADR },   // 0xDEF6 v_charge_pilot, mt_i3_v_charge_pilotsignal
     { I3_ECU_LIM_TX, I3_ECU_LIM_RX, VEHICLE_POLL_TYPE_OBDIIEXTENDED, I3_PID_LIM_LADESCHNITTSTELLE_DC_TEPCO,               {  0, 10, 10, 10 }, 0, ISOTP_EXTADR },   // 0xDEF7  mt_i3_v_charge_dc_plugconnected, mt_i3_v_charge_dc_controlsignals (but don't seem to work)
     { I3_ECU_LIM_TX, I3_ECU_LIM_RX, VEHICLE_POLL_TYPE_OBDIIEXTENDED, I3_PID_LIM_DC_SCHUETZ_SCHALTER,                      {  0, 10, 10, 10 }, 0, ISOTP_EXTADR },   // 0xDEF8 mt_i3_v_charge_dc_contactorstatus

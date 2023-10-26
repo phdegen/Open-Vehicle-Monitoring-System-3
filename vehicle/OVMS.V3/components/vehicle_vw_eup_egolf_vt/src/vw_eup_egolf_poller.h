@@ -40,7 +40,7 @@ static const OvmsVehicle::poll_pid_t vw_id3_polls[] = {
 //{ 0x7E5, 0x7ED, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x1EAE, { 10, 10, 10, 10 }, 0, ISOTP_STD }, // Cell temperature base
 
 //Battery Charge Management (/Charger)
-{ 0x765, 0x7CF, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x1DDA, { 10, 10, 10, 10 }, 0, ISOTP_STD }, // Steckdose A für Batterieladung
+{ 0x765, 0x7CF, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x1DDA, { 1, 1, 10, 10 }, 0, ISOTP_STD }, // Steckdose A für Batterieladung
 
 //Battery Charge
 { 0x744, 0x7AE, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x15D6, { 10, 10, 10, 10 }, 0, ISOTP_STD }, // Charging power efficiency

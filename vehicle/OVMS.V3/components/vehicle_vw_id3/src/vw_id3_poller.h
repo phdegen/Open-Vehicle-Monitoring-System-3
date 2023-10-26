@@ -208,7 +208,7 @@ static const OvmsVehicle::poll_pid_t vw_id3_polls[] = {
 
 // ECU 4 (/ gateway ?)
 //{ 0x710, 0x77A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x15D5, { 10, 10, 10, 10 }, 0, ISOTP_STD }, // Gateway charging active ?
-{ 0x710, 0x77A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x084F, { 10, 10, 10, 10 }, 0, ISOTP_STD }, // Gateway charge plug locked 1= lock
+{ 0x710, 0x77A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x084F, { 1, 1, 10, 10 }, 0, ISOTP_STD }, // Gateway charge plug locked 1= lock
 //{ 0x710, 0x77A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x2AB2, { 10, 10, 10, 10 }, 0, ISOTP_STD }, // HV battery max energy content Wh
 { 0x710, 0x77A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x2AB6, { 10, 10, 10, 10 }, 0, ISOTP_STD }, // Gateway range display
 ////not confirmed{ 0x710, 0x77A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x2AB8, { 10, 10, 10, 10 }, 0, ISOTP_STD }, // HV battery energy content
