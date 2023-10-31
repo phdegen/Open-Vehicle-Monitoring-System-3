@@ -74,7 +74,7 @@ void OvmsVehicleVWID3::IncomingBMS(uint16_t type, uint16_t pid, const char* data
       break;
 
     case 0x1E3D:
-      StandardMetrics.ms_v_bat_current->SetValue((float)(CAN_UINT32(0) - 150000) / 100, Amps);
+      StandardMetrics.ms_v_bat_current->SetValue((((float)CAN_UINT32(0)) - 150000.0) / 100.0, Amps);
       //ESP_LOGD(TAG, "0x1E3D ms_v_bat_current: %f", CAN_UINT32(0) - 150000 / 100);
       break;
 
