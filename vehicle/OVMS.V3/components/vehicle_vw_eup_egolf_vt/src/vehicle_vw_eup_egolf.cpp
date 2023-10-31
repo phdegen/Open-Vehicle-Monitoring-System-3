@@ -30,36 +30,38 @@
 #include <string>
 
 #include "vehicle_vw_eup_egolf.h"
-#include "vw_id3_poller.h"
+#include "vw_eup_egolf_poller.h"
 
 const char *OvmsVehicleVWEUPEGolf::s_tag = "v-vw-eup-egolf";
 
 OvmsVehicleVWEUPEGolf::OvmsVehicleVWEUPEGolf() {
-  ESP_LOGI(TAG, "Start VW ID.3 vehicle module");
+  ESP_LOGI(TAG, "Start VW eUp eGolf vehicle module");
 
   //Init variables supressing push on boot up
-  StandardMetrics.ms_v_type->SetValue("VWID3");
+  StandardMetrics.ms_v_type->SetValue("VWEUPEGOLF");
   StandardMetrics.ms_v_charge_inprogress->SetValue(false);
   StandardMetrics.ms_v_charge_pilot->SetValue(false);
   StandardMetrics.ms_v_charge_state->SetValue("stopped");
   StandardMetrics.ms_v_charge_substate->SetValue("stopped");
   StandardMetrics.ms_v_env_on->SetValue(false);
   
-  MyConfig.RegisterParam("xvwid3", "VW ID.3 configuration", true, true);
+  MyConfig.RegisterParam("xvweupegolf", "VW EUPEGOLF configuration", true, true);
   ConfigChanged(NULL);
 
-  // Init VW ID3 Connection (CAN Gateway)
+  // Init VW eUP / eGolf Connection (CAN Gateway)
   RegisterCanBus(1, CAN_MODE_ACTIVE, CAN_SPEED_500KBPS);
 
   POLLSTATE_OFF;
   ESP_LOGI(TAG, "Pollstate switched to OFF");
   
-  PollSetPidList(m_can1, vw_id3_polls);
+  PollSetPidList(m_can1, vw_eupegolf_polls);
   PollSetThrottling(10);
   PollSetResponseSeparationTime(20);
   
-  // VW ID.3 specific metrics
-  mt_pos_odometer_start       = MyMetrics.InitFloat("zph2.v.pos.odometer.start", SM_STALE_MID, 0, Kilometers, true);
+  // VW eupegolf specific metrics
+  mt_pos_odometer_start       = MyMetrics.InitFloat("vweup.v.pos.odometer.start", SM_STALE_MID, 0, Kilometers, true);
+  mt_chrg_eff_ecu             = MyMetrics.InitFloat("vweup.v.c.eff", SM_STALE_MID, 0, Percentage, true);
+  mt_chrg_loss_ecu            = MyMetrics.InitFloat("vweup.v.c.loss", SM_STALE_MID, 0, kW, true);
 
   // BMS configuration:
   BmsSetCellArrangementVoltage(96, 1);
@@ -73,7 +75,7 @@ OvmsVehicleVWEUPEGolf::OvmsVehicleVWEUPEGolf() {
 }
 
 OvmsVehicleVWEUPEGolf::~OvmsVehicleVWEUPEGolf() {
-  ESP_LOGI(TAG, "Stop Renault Zoe Ph2 (OBD) vehicle module");
+  ESP_LOGI(TAG, "Stop VW eUp eGolf vehicle module");
 }
 
 /**

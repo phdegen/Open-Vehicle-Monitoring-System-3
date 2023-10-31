@@ -27,7 +27,7 @@
 // Pollstate 1 - POLLSTATE_ON       - car is on
 // Pollstate 2 - POLLSTATE_DRIVING  - car is driving
 // Pollstate 3 - POLLSTATE_CHARGING - car is charging
-static const OvmsVehicle::poll_pid_t vw_id3_polls[] = {
+static const OvmsVehicle::poll_pid_t vw_eupegolf_polls[] = {
 //***TX-ID, ***RX-ID, ***SID, ***PID, { Polltime (seconds) for Pollstate 0, 1, 2, 3}, ***CAN BUS Interface, ***FRAMETYPE
 
 //Battery Management
