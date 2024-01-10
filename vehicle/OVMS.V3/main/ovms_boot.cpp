@@ -650,6 +650,8 @@ extern "C" void esp_task_wdt_isr_user_handler(void)
   snprintf(boot_data.wdt_tasknames, sizeof(boot_data.wdt_tasknames), "(unavailable)");
   #warning "(TODO) ESP-IDF >= 4 : list of tasks triggering WDT not available."
 #endif
+  /* restart firmware (VEIU hack because wdt did not restart fw in field..) */
+  esp_restart();
   }
 
 /*
