@@ -47,13 +47,13 @@ void OvmsVehicleVWEUPEGolf::IncomingBMS(uint16_t type, uint16_t pid, const char*
       break;
 
     case 0x1E3D:
-      StandardMetrics.ms_v_bat_current->SetValue((float)(CAN_UINT32(0) - 2044) / 4, Amps);
-      //ESP_LOGD(TAG, "0x1E3D ms_v_bat_current: %f", CAN_UINT32(0) - 150000 / 100);
+      StandardMetrics.ms_v_bat_current->SetValue(((float)(CAN_UINT(0) - 2044)) / 4, Amps);
+      //ESP_LOGD(TAG, "0x1E3D ms_v_bat_current: %f", ((float)(CAN_UINT(0) - 2044)) / 4);
       break;
 
     case 0x2A0B:
       StandardMetrics.ms_v_bat_temp->SetValue((float)((int16_t)CAN_UINT(0))/64, Celcius);
-      //ESP_LOGD(TAG, "0x2A0B ms_v_bat_temp: %f", CAN_BYTE(0)/2 - 40);
+      //ESP_LOGD(TAG, "0x2A0B ms_v_bat_temp: %f", (float)((int16_t)CAN_UINT(0))/64);
       break;
 
     default: {
