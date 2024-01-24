@@ -59,6 +59,71 @@ void OvmsVehicleNLZE1::IncomingBMS(uint16_t type, uint16_t pid, const char* data
 
       break;
     }
+
+    case 0x02: {
+
+      for(int i = 0; i< 96; i++) {
+        StandardMetrics.ms_v_bat_cell_voltage->SetElemValue(i,(float)CAN_UINT(i*2)/1000, Volts);
+        //ESP_LOGD(TAG, "0x01 ms_v_bat_cell_voltage nr %d : %f", i, CAN_UINT(i*2)/1000);
+      }
+      break;
+    }
+
+    case 0x04: {
+      int bat_rack_temp_raw;
+      float bat_rack_temp_f;
+      for(int i = 0; i< 4; i++) {
+        bat_rack_temp_raw = CAN_UINT(i*2);
+        
+        if(bat_rack_temp_raw == 1021) {
+          bat_rack_temp_f = 1.0;
+        }
+        else if(bat_rack_temp_raw >= 589){
+          bat_rack_temp_f = 162.0 - (bat_rack_temp_raw * 0.181);
+        }
+        else if(bat_rack_temp_raw >= 569){
+          bat_rack_temp_f = 57.2 + ((579 - bat_rack_temp_raw) * 0.18);
+        }
+        else if(bat_rack_temp_raw >= 558){
+          bat_rack_temp_f = 60.8 + ((558 - bat_rack_temp_raw) * 0.16363636363636364);
+        }
+        else if(bat_rack_temp_raw >= 548){
+          bat_rack_temp_f = 62.6 + ((548 - bat_rack_temp_raw) * 0.18);
+        }
+        else if(bat_rack_temp_raw >= 537){
+          bat_rack_temp_f = 64.4 + ((537 - bat_rack_temp_raw) * 0.16363636363636364);
+        }
+        else if(bat_rack_temp_raw >= 447){
+          bat_rack_temp_f = 66.2 + ((527 - bat_rack_temp_raw) * 0.18);
+        }
+        else if(bat_rack_temp_raw >= 438){
+          bat_rack_temp_f = 82.4 + ((438 - bat_rack_temp_raw) * 0.2);
+        }
+        else if(bat_rack_temp_raw >= 428){
+          bat_rack_temp_f = 84.2 + ((428 - bat_rack_temp_raw) * 0.18);
+        }
+        else if(bat_rack_temp_raw >= 365){
+          bat_rack_temp_f = 86.0 + ((419 - bat_rack_temp_raw) * 0.2);
+        }
+        else if(bat_rack_temp_raw >= 357){
+          bat_rack_temp_f = 98.6 + ((357 - bat_rack_temp_raw) * 0.225);
+        }
+        else if(bat_rack_temp_raw >= 348){
+          bat_rack_temp_f = 100.4 + ((348 - bat_rack_temp_raw) * 0.2);
+        }
+        else if(bat_rack_temp_raw >= 316){
+          bat_rack_temp_f = 102.2 + ((340 - bat_rack_temp_raw) * 0.225);
+        }
+        else {
+          bat_rack_temp_f = 109.4 + ((309 - bat_rack_temp_raw) * 0.2571428571428572);
+        }
+
+
+        StandardMetrics.ms_v_bat_cell_temp->SetElemValue(i,(bat_rack_temp_f-32.0)* 5.0 / 9.0, Celcius);
+        //ESP_LOGD(TAG, "0x01 ms_v_bat_cell_temp nr %d : %f", i, (bat_rack_temp_f-32.0)* 5.0 / 9.0);
+      }
+      break;
+    }
     
     default: {
       char *buf = NULL;
