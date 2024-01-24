@@ -598,6 +598,13 @@ config OVMS_VEHICLE_VW_EUP_EGOLF
     help
         Enable to include support for VW eup and egolf vehicle.
 
+config OVMS_VEHICLE_NISSANLEAF_ZE1
+    bool "Include support for Nissan Leaf ZE1 vehicle"
+    default n
+    depends on OVMS
+    help
+        Enable to include support for NL ZE1 vehicle.
+
 config OVMS_VEHICLE_RXTASK_STACK
     int "Stack size for vehicle RX task"
     default 6144
