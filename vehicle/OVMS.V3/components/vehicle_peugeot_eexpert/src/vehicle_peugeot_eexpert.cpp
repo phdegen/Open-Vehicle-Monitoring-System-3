@@ -80,11 +80,20 @@ void OvmsVehiclePeugeotEexpert::IncomingFrameCan1(CAN_frame_t* p_frame)
   static bool lastCharging = false;
    
   switch (p_frame->MsgID) {
-  case 0x105: // Motor RPM
+  case 0x552: // Odometer
     {
-      int rpm = ((d[0]&0x3f) << 8) + d[1]; 
-      StandardMetrics.ms_v_mot_rpm->SetValue(rpm); // RPM
-      StandardMetrics.ms_v_env_throttle->SetValue(d[4]/2.50); // Drive pedal state [%], raw values are from 0 to 250
+      StandardMetrics.ms_v_pos_odometer->SetValue((d[4] << 16) + (d[5] << 8) + d[6], Kilometers);
+      break;
+    }
+
+  case 0x4a2: // Charge plug
+    {
+      if((d[1] & 0x40) == 0) {
+        StandardMetrics.ms_v_door_chargeport->SetValue(true);
+      }
+      else {
+        StandardMetrics.ms_v_door_chargeport->SetValue(false);
+      }
       break;
     }
 
