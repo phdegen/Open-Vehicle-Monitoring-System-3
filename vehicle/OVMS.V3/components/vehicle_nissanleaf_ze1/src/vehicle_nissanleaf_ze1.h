@@ -70,6 +70,7 @@ class OvmsVehicleNLZE1 : public OvmsVehicle {
     		
     // NL ZE1 specific metrics
     OvmsMetricFloat  *mt_b_current2;      //HV Battery current 2
+    OvmsMetricInt  *mt_e_hvac_power;      //HV Battery current 2
     
   protected:
     string nl_ze1_obd_rxbuf;

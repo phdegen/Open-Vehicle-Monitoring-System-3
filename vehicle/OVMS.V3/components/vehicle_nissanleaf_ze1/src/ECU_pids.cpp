@@ -114,6 +114,12 @@ void OvmsVehicleNLZE1::IncomingECU3(uint16_t type, uint16_t pid, const char* dat
       //ESP_LOGD(TAG, "0x1106 EVC ms_v_env_cooling: %f", CAN_BYTE(0));
       break;
     }
+    case 0x1151: {  
+      //HVAC Power
+      mt_e_hvac_power->SetValue(CAN_BYTE(0)*250, Watts);
+      //ESP_LOGD(TAG, "0x1151 EVC mt_e_hvac_power: %d", CAN_BYTE(0)*250);
+      break;
+    }
 
     default: {
       char *buf = NULL;
@@ -144,22 +150,22 @@ void OvmsVehicleNLZE1::IncomingECU4(uint16_t type, uint16_t pid, const char* dat
     }
     case 0x0E25: {  
       StandardMetrics.ms_v_tpms_pressure->SetElemValue(MS_V_TPMS_IDX_FR, (float)CAN_BYTE(0)*0.068947576*25, kPa);
-      //ESP_LOGD(TAG, "0x0E24 EVC ms_v_tpms_pressure FR: %f", CAN_BYTE(0)*0.068947576*25);
+      //ESP_LOGD(TAG, "0x0E25 EVC ms_v_tpms_pressure FR: %f", CAN_BYTE(0)*0.068947576*25);
       break;
     }
     case 0x0E26: {  
       StandardMetrics.ms_v_tpms_pressure->SetElemValue(MS_V_TPMS_IDX_FL, (float)CAN_BYTE(0)*0.068947576*25, kPa);
-      //ESP_LOGD(TAG, "0x0E24 EVC ms_v_tpms_pressure FL: %f", CAN_BYTE(0)*0.068947576*25);
+      //ESP_LOGD(TAG, "0x0E26 EVC ms_v_tpms_pressure FL: %f", CAN_BYTE(0)*0.068947576*25);
       break;
     }
     case 0x0E27: {  
       StandardMetrics.ms_v_tpms_pressure->SetElemValue(MS_V_TPMS_IDX_RR, (float)CAN_BYTE(0)*0.068947576*25, kPa);
-      //ESP_LOGD(TAG, "0x0E24 EVC ms_v_tpms_pressure RR: %f", CAN_BYTE(0)*0.068947576*25);
+      //ESP_LOGD(TAG, "0x0E27 EVC ms_v_tpms_pressure RR: %f", CAN_BYTE(0)*0.068947576*25);
       break;
     }
     case 0x0E28: {  
       StandardMetrics.ms_v_tpms_pressure->SetElemValue(MS_V_TPMS_IDX_RL, (float)CAN_BYTE(0)*0.068947576*25, kPa);
-      //ESP_LOGD(TAG, "0x0E24 EVC ms_v_tpms_pressure RL: %f", CAN_BYTE(0)*0.068947576*25);
+      //ESP_LOGD(TAG, "0x0E28 EVC ms_v_tpms_pressure RL: %f", CAN_BYTE(0)*0.068947576*25);
       break;
     }
     default: {

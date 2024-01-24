@@ -64,7 +64,7 @@ void OvmsVehicleNLZE1::IncomingBMS(uint16_t type, uint16_t pid, const char* data
 
       for(int i = 0; i< 96; i++) {
         StandardMetrics.ms_v_bat_cell_voltage->SetElemValue(i,(float)CAN_UINT(i*2)/1000, Volts);
-        //ESP_LOGD(TAG, "0x01 ms_v_bat_cell_voltage nr %d : %f", i, CAN_UINT(i*2)/1000);
+        //ESP_LOGD(TAG, "0x02 ms_v_bat_cell_voltage nr %d : %f", i, CAN_UINT(i*2)/1000);
       }
       break;
     }
@@ -120,7 +120,7 @@ void OvmsVehicleNLZE1::IncomingBMS(uint16_t type, uint16_t pid, const char* data
 
 
         StandardMetrics.ms_v_bat_cell_temp->SetElemValue(i,(bat_rack_temp_f-32.0)* 5.0 / 9.0, Celcius);
-        //ESP_LOGD(TAG, "0x01 ms_v_bat_cell_temp nr %d : %f", i, (bat_rack_temp_f-32.0)* 5.0 / 9.0);
+        //ESP_LOGD(TAG, "0x04 ms_v_bat_cell_temp nr %d : %f", i, (bat_rack_temp_f-32.0)* 5.0 / 9.0);
       }
       break;
     }

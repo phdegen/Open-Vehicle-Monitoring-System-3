@@ -51,6 +51,7 @@ static const OvmsVehicle::poll_pid_t nl_ze1_polls[] = {
 { 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x1146, { 10, 10, 10, 10 }, 0, ISOTP_STD }, // Motor power W
 { 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x121A, { 10, 10, 10, 10 }, 0, ISOTP_STD }, // Speed, km/h
 { 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x1106, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // AC status
+{ 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x1151, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // AC status
 
 // ECU 4 / BCM
 { 0x743, 0x763, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0E01, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // Odometer, km

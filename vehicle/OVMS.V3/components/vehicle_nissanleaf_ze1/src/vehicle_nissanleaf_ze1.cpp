@@ -60,6 +60,7 @@ OvmsVehicleNLZE1::OvmsVehicleNLZE1() {
   
   // NL ze1 specific metrics
   mt_b_current2       = MyMetrics.InitFloat("nlze1.b.current2", SM_STALE_MID, 0, Amps, false);
+  mt_e_hvac_power     = MyMetrics.InitInt("v.e.hvac.power", SM_STALE_MID, 0, Watts, false);
 
   // BMS configuration:
   BmsSetCellArrangementVoltage(96, 1);
