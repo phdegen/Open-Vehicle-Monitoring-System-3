@@ -142,6 +142,26 @@ void OvmsVehicleNLZE1::IncomingECU4(uint16_t type, uint16_t pid, const char* dat
       //ESP_LOGD(TAG, "0x0E24 EVC ms_v_bat_range_est: %d", CAN_UINT(0)/10);
       break;
     }
+    case 0x0E25: {  
+      StandardMetrics.ms_v_tpms_pressure->SetElemValue(MS_V_TPMS_IDX_FR, (float)CAN_BYTE(0)*0.068947576*25, kPa);
+      //ESP_LOGD(TAG, "0x0E24 EVC ms_v_tpms_pressure FR: %f", CAN_BYTE(0)*0.068947576*25);
+      break;
+    }
+    case 0x0E26: {  
+      StandardMetrics.ms_v_tpms_pressure->SetElemValue(MS_V_TPMS_IDX_FL, (float)CAN_BYTE(0)*0.068947576*25, kPa);
+      //ESP_LOGD(TAG, "0x0E24 EVC ms_v_tpms_pressure FL: %f", CAN_BYTE(0)*0.068947576*25);
+      break;
+    }
+    case 0x0E27: {  
+      StandardMetrics.ms_v_tpms_pressure->SetElemValue(MS_V_TPMS_IDX_RR, (float)CAN_BYTE(0)*0.068947576*25, kPa);
+      //ESP_LOGD(TAG, "0x0E24 EVC ms_v_tpms_pressure RR: %f", CAN_BYTE(0)*0.068947576*25);
+      break;
+    }
+    case 0x0E28: {  
+      StandardMetrics.ms_v_tpms_pressure->SetElemValue(MS_V_TPMS_IDX_RL, (float)CAN_BYTE(0)*0.068947576*25, kPa);
+      //ESP_LOGD(TAG, "0x0E24 EVC ms_v_tpms_pressure RL: %f", CAN_BYTE(0)*0.068947576*25);
+      break;
+    }
     default: {
       char *buf = NULL;
       size_t rlen = len, offset = 0;

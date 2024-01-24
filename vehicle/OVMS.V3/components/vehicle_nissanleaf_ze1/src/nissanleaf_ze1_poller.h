@@ -55,6 +55,10 @@ static const OvmsVehicle::poll_pid_t nl_ze1_polls[] = {
 // ECU 4 / BCM
 { 0x743, 0x763, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0E01, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // Odometer, km
 { 0x743, 0x763, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0E24, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // Range, km
+{ 0x743, 0x763, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0E25, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // Tire pressure FR, kPa
+{ 0x743, 0x763, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0E26, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // Tire pressure FL, kPa
+{ 0x743, 0x763, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0E27, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // Tire pressure RR, kPa
+{ 0x743, 0x763, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0E28, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // Tire pressure RL, kPa
 
 
 
