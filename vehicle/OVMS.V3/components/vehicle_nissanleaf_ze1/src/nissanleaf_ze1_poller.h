@@ -32,34 +32,34 @@ static const OvmsVehicle::poll_pid_t nl_ze1_polls[] = {
 
 
 // BMS / LBC (Lithium battery controller)
-{ 0x79B, 0x7BB, VEHICLE_POLL_TYPE_OBDIIGROUP, 0x01, { 30, 30, 30, 30 }, 0, ISOTP_STD }, // Group 1: Health, SOC, HV current 1/2, HV voltage
-{ 0x79B, 0x7BB, VEHICLE_POLL_TYPE_OBDIIGROUP, 0x02, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // Group 2: Cell voltages
-{ 0x79B, 0x7BB, VEHICLE_POLL_TYPE_OBDIIGROUP, 0x04, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // Group 2: Packs temperatures
+{ 0x79B, 0x7BB, VEHICLE_POLL_TYPE_OBDIIGROUP, 0x01, { 0, 30, 30, 30 }, 0, ISOTP_STD }, // Group 1: Health, SOC, HV current 1/2, HV voltage
+{ 0x79B, 0x7BB, VEHICLE_POLL_TYPE_OBDIIGROUP, 0x02, { 0, 60, 60, 60 }, 0, ISOTP_STD }, // Group 2: Cell voltages
+{ 0x79B, 0x7BB, VEHICLE_POLL_TYPE_OBDIIGROUP, 0x04, { 0, 60, 60, 60 }, 0, ISOTP_STD }, // Group 2: Packs temperatures
 
 
 // ECU 1 / HVAC
-//{ 0x744, 0x764, VEHICLE_POLL_TYPE_OBDIIGROUP, 0x01, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // Heater temp. and fan speed
+//{ 0x744, 0x764, VEHICLE_POLL_TYPE_OBDIIGROUP, 0x01, { 0, 60, 60, 60 }, 0, ISOTP_STD }, // Heater temp. and fan speed
 
 // ECU 2 / Meter
-//{ 0x745, 0x765, VEHICLE_POLL_TYPE_OBDIIGROUP, 0x09, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // Lever, wiper and light status
+//{ 0x745, 0x765, VEHICLE_POLL_TYPE_OBDIIGROUP, 0x09, { 0, 60, 60, 60 }, 0, ISOTP_STD }, // Lever, wiper and light status
 
 // ECU 3 / VCM
-{ 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x115D, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // Ambient temperature, °C
-{ 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x1234, { 1, 1, 10, 10 }, 0, ISOTP_STD }, // Plug state 
-{ 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x114E, { 30, 30, 30, 30 }, 0, ISOTP_STD }, // Charge mode
-{ 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x1236, { 10, 10, 10, 10 }, 0, ISOTP_STD }, // Charging power (on-board charger) W
-{ 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x1146, { 10, 10, 10, 10 }, 0, ISOTP_STD }, // Motor power W
-{ 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x121A, { 10, 10, 10, 10 }, 0, ISOTP_STD }, // Speed, km/h
-{ 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x1106, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // AC status
-{ 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x1151, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // AC status
+{ 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x115D, { 0, 60, 60, 60 }, 0, ISOTP_STD }, // Ambient temperature, °C
+{ 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x1234, { 0, 1, 10, 10 }, 0, ISOTP_STD }, // Plug state 
+{ 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x114E, { 0, 30, 30, 30 }, 0, ISOTP_STD }, // Charge mode
+{ 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x1236, { 0, 10, 10, 10 }, 0, ISOTP_STD }, // Charging power (on-board charger) W
+{ 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x1146, { 0, 10, 10, 10 }, 0, ISOTP_STD }, // Motor power W
+{ 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x121A, { 0, 10, 10, 10 }, 0, ISOTP_STD }, // Speed, km/h
+{ 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x1106, { 0, 60, 60, 60 }, 0, ISOTP_STD }, // AC status
+{ 0x797, 0x79A, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x1151, { 0, 60, 60, 60 }, 0, ISOTP_STD }, // HVAC power
 
 // ECU 4 / BCM
-{ 0x743, 0x763, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0E01, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // Odometer, km
-{ 0x743, 0x763, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0E24, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // Range, km
-{ 0x743, 0x763, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0E25, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // Tire pressure FR, kPa
-{ 0x743, 0x763, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0E26, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // Tire pressure FL, kPa
-{ 0x743, 0x763, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0E27, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // Tire pressure RR, kPa
-{ 0x743, 0x763, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0E28, { 60, 60, 60, 60 }, 0, ISOTP_STD }, // Tire pressure RL, kPa
+{ 0x743, 0x763, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0E01, { 0, 60, 60, 60 }, 0, ISOTP_STD }, // Odometer, km
+{ 0x743, 0x763, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0E24, { 0, 60, 60, 60 }, 0, ISOTP_STD }, // Range, km
+{ 0x743, 0x763, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0E25, { 0, 60, 60, 60 }, 0, ISOTP_STD }, // Tire pressure FR, kPa
+{ 0x743, 0x763, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0E26, { 0, 60, 60, 60 }, 0, ISOTP_STD }, // Tire pressure FL, kPa
+{ 0x743, 0x763, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0E27, { 0, 60, 60, 60 }, 0, ISOTP_STD }, // Tire pressure RR, kPa
+{ 0x743, 0x763, VEHICLE_POLL_TYPE_OBDIIEXTENDED, 0x0E28, { 0, 60, 60, 60 }, 0, ISOTP_STD }, // Tire pressure RL, kPa
 
 
 
