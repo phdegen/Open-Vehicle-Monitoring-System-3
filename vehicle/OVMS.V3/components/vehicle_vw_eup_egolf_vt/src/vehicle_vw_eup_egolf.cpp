@@ -51,12 +51,13 @@ OvmsVehicleVWEUPEGolf::OvmsVehicleVWEUPEGolf() {
   // Init VW eUP / eGolf Connection (CAN Gateway)
   RegisterCanBus(1, CAN_MODE_ACTIVE, CAN_SPEED_500KBPS);
 
-  POLLSTATE_OFF;
+  PollSetState(POLLSTATE_OFF);
   ESP_LOGI(TAG, "Pollstate switched to OFF");
   
   PollSetPidList(m_can1, vw_eupegolf_polls);
   PollSetThrottling(10);
   PollSetResponseSeparationTime(20);
+  pollstate_delay_ticker_s = 0;
   
   // VW eupegolf specific metrics
   mt_pos_odometer_start       = MyMetrics.InitFloat("vweup.v.pos.odometer.start", SM_STALE_MID, 0, Kilometers, true);
@@ -71,11 +72,38 @@ OvmsVehicleVWEUPEGolf::OvmsVehicleVWEUPEGolf() {
   BmsSetCellDefaultThresholdsVoltage(0.030, 0.050);
   BmsSetCellDefaultThresholdsTemperature(4.0, 5.0);  
 
-  POLLSTATE_ON;
+  PollSetState(POLLSTATE_ON);
+  ESP_LOGI(TAG, "Pollstate switched to ON");
 }
 
 OvmsVehicleVWEUPEGolf::~OvmsVehicleVWEUPEGolf() {
   ESP_LOGI(TAG, "Stop VW eUp eGolf vehicle module");
+}
+
+void OvmsVehicleVWEUPEGolf::PollerStateTicker() {
+  float voltage_level_12V = StandardMetrics.ms_v_bat_12v_voltage->AsFloat();
+  float active_threshold = MyConfig.GetParamValueFloat("vehicle", "12v.active_threshold", 13.0);
+
+  if(m_poll_state == POLLSTATE_ON) {
+    if(voltage_level_12V < active_threshold) {
+      pollstate_delay_ticker_s++;
+      if(pollstate_delay_ticker_s == 1) {
+        ESP_LOGI(TAG, "12V not powered anymore -> Car is inactive");
+      }
+      if(pollstate_delay_ticker_s > 60* MyConfig.GetParamValueInt("vehicle", "poll.inactive_delay_min", 5)) {
+        PollSetState(POLLSTATE_OFF);
+        ESP_LOGI(TAG, "Inactivity pollstate delay passed: stop polling.");
+      }
+    }
+    else {
+      pollstate_delay_ticker_s = 0;
+    }
+  }
+  else if(m_poll_state == POLLSTATE_OFF && voltage_level_12V > active_threshold){
+    PollSetState(POLLSTATE_ON);
+    pollstate_delay_ticker_s = 0;
+    ESP_LOGI(TAG, "12V charge level up again -> Car active, start polling data.");
+  }
 }
 
 /**

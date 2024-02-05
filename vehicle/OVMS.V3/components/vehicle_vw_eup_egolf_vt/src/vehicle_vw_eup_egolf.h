@@ -40,10 +40,13 @@
 #define CAN_NIBH(b)     (data[b] >> 4)
 #define CAN_NIB(n)      (((n)&1) ? CAN_NIBL((n)>>1) : CAN_NIBH((n)>>1))
 
-#define POLLSTATE_OFF					PollSetState(0);
-#define POLLSTATE_ON					PollSetState(1);
-#define POLLSTATE_DRIVING			PollSetState(2);
-#define POLLSTATE_CHARGING		PollSetState(3);
+enum poll_states
+  {
+  POLLSTATE_OFF,      //- car is off
+  POLLSTATE_ON,       //- car is on
+  POLLSTATE_RUNNING,  //- car is in drive/reverse
+  POLLSTATE_CHARGING  //- car is charging
+  };
 
 using namespace std;
 
@@ -61,6 +64,7 @@ class OvmsVehicleVWEUPEGolf : public OvmsVehicle {
 
 
 	protected:
+    void PollerStateTicker();
     void IncomingBMS(uint16_t type, uint16_t pid, const char* data, uint16_t len);
     void IncomingECU1(uint16_t type, uint16_t pid, const char* data, uint16_t len);
     void IncomingECU2(uint16_t type, uint16_t pid, const char* data, uint16_t len);
@@ -72,6 +76,7 @@ class OvmsVehicleVWEUPEGolf : public OvmsVehicle {
     OvmsMetricFloat  *mt_chrg_loss_ecu;           // Power loss of Charger [kW] (from ECU)
     
   protected:
+    int pollstate_delay_ticker_s;
     string eup_egolf_obd_rxbuf;
     char eup_egolf_vin[15] = "";
 };
