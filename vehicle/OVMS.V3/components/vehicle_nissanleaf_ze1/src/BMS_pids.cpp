@@ -73,7 +73,7 @@ void OvmsVehicleNLZE1::IncomingBMS(uint16_t type, uint16_t pid, const char* data
       int bat_rack_temp_raw;
       float bat_rack_temp_f;
       for(int i = 0; i< 4; i++) {
-        bat_rack_temp_raw = CAN_UINT(i*2);
+        bat_rack_temp_raw = CAN_UINT(i*3);
         
         if(bat_rack_temp_raw == 1021) {
           bat_rack_temp_f = 1.0;
