@@ -641,7 +641,7 @@ void modem::State1Enter(modem_state1_t newstate)
     case NetLoss:
       MyEvents.SignalEvent("system.modem.netloss", NULL);
       m_state1_timeout_ticks = 10;
-      m_state1_timeout_goto = NetWait;
+      m_state1_timeout_goto = PowerOffOn;
       if (m_mux != NULL)
         { muxtx(m_mux_channel_POLL, "AT+CGATT=0\r\n"); }
       StopPPP();
