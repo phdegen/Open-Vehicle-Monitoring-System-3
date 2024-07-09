@@ -31,7 +31,7 @@ void OvmsVehicleVWID3::IncomingBMS(uint16_t type, uint16_t pid, const char* data
   
   switch (pid) {
     case 0x028C:  // SOC (BMS)
-      StandardMetrics.ms_v_bat_soc->SetValue((float)CAN_BYTE(0) /2.5, Percentage);
+      StandardMetrics.ms_v_bat_soc->SetValue(((float)CAN_BYTE(0) /2.5) + 4.0, Percentage);
       //ESP_LOGD(TAG, "0x028C ms_v_bat_soc: %f", CAN_BYTE(0) /2.5);
       break;
     
