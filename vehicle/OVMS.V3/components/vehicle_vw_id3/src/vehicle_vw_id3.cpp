@@ -70,8 +70,6 @@ OvmsVehicleVWID3::OvmsVehicleVWID3() {
   BmsSetCellDefaultThresholdsVoltage(0.030, 0.050);
   BmsSetCellDefaultThresholdsTemperature(4.0, 5.0);  
 
-  PollSetState(POLLSTATE_ON);
-  ESP_LOGI(TAG, "Pollstate switched to ON");
 }
 
 OvmsVehicleVWID3::~OvmsVehicleVWID3() {
