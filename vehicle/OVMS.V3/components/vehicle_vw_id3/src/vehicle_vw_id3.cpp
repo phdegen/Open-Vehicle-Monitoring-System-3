@@ -78,7 +78,7 @@ OvmsVehicleVWID3::~OvmsVehicleVWID3() {
 
 void OvmsVehicleVWID3::PollerStateTicker() {
   float voltage_level_12V = StandardMetrics.ms_v_bat_12v_voltage->AsFloat();
-  float active_threshold = MyConfig.GetParamValueFloat("vehicle", "12v.active_threshold", 13.0);
+  float active_threshold = MyConfig.GetParamValueFloat("vehicle", "12v.active_threshold", 13.1);
 
   if(m_poll_state == POLLSTATE_ON) {
     if(voltage_level_12V < active_threshold) {
